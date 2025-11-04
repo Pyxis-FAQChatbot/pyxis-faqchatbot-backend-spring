@@ -46,13 +46,13 @@ public class UserService {
 
     public void existUsersByNickname(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
-            throw new CustomException(ErrorType.NICKNAME_ALREADY_EXISTS, List.of("nickname"));
+            throw new CustomException(ErrorType.NICKNAME_ALREADY_EXISTS);
         }
     }
 
     public void existUsersByLoginId(String loginId) {
         if (userRepository.existsByLoginId(loginId)) {
-            throw new CustomException(ErrorType.LOGINID_ALREADY_EXISTS, List.of("loginId"));
+            throw new CustomException(ErrorType.LOGINID_ALREADY_EXISTS);
         }
     }
 }

@@ -4,10 +4,7 @@ import com.pyxis.backend.user.dto.SignupRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -22,4 +19,17 @@ public class UserController {
 
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/check-nickname")
+    public ResponseEntity<?> checkNickname(@RequestParam String nickname) {
+        userService.existUsersByNickname(nickname);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/check-id")
+    public ResponseEntity<?> checkLoginId(@RequestParam String loginId) {
+        userService.existUsersByLoginId(loginId);
+        return ResponseEntity.ok().build();
+    }
+
 }
