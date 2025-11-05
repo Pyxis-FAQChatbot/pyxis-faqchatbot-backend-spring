@@ -1,14 +1,18 @@
 package com.pyxis.backend.chat.botchat;
 
+import com.pyxis.backend.chat.botchat.dto.BotchatListResponse;
 import com.pyxis.backend.chat.botchat.dto.CreateBotchatRequest;
 import com.pyxis.backend.chat.botchat.dto.CreateBotchatResponse;
 import com.pyxis.backend.chat.botchat.entity.Botchat;
+import com.pyxis.backend.common.dto.PageResponse;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
 import com.pyxis.backend.user.UserRepository;
 import com.pyxis.backend.user.dto.SessionUser;
 import com.pyxis.backend.user.entity.Users;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,5 +37,15 @@ public class BotchatService {
 
         // 3. Response 반환
         return CreateBotchatResponse.of(botchat);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<BotchatListResponse> getBotchatList(SessionUser sessionUser, Pageable pageable) {
+        Page<BotchatListResponse> responsePage = botchatRepository.findByUserIdWithLastMessage(
+                sessionUser.getId(),
+                pageable
+        );
+
+        return PageResponse.of(responsePage);
     }
 }
