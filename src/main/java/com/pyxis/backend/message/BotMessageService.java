@@ -2,8 +2,10 @@ package com.pyxis.backend.message;
 
 import com.pyxis.backend.chat.botchat.BotchatRepository;
 import com.pyxis.backend.chat.botchat.entity.Botchat;
+import com.pyxis.backend.common.dto.PageResponse;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
+import com.pyxis.backend.message.dto.BotMessageResponse;
 import com.pyxis.backend.message.dto.ChatMessageRequest;
 import com.pyxis.backend.message.dto.ChatMessageResponse;
 import com.pyxis.backend.message.dto.SourceData;
@@ -13,6 +15,8 @@ import com.pyxis.backend.user.dto.SessionUser;
 import com.pyxis.backend.user.entity.Users;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,5 +63,28 @@ public class BotMessageService {
 
         return ChatMessageResponse.of(message);
 
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<BotMessageResponse> chatbotMessageList(
+            Long chatbotId,
+            Pageable pageable,
+            SessionUser sessionUser) {
+
+        // 1. Botchat 존재 및 권한 확인
+        Botchat botchat = botchatRepository.findById(chatbotId)
+                .orElseThrow(() -> new CustomException(ErrorType.BOTCHAT_NOT_FOUND));
+
+        if (!botchat.getUser().getId().equals(sessionUser.getId())) {
+            throw new CustomException(ErrorType.USER_FORBIDDEN);
+        }
+
+        // 2. 메시지 조회 및 변환
+        Page<BotMessage> botMessagePage = botMessageRepository
+                .findByBotchatIdAndUserId(chatbotId, sessionUser.getId(), pageable);
+
+        return PageResponse.of(
+                botMessagePage.map(message -> BotMessageResponse.of(message, List.of()))
+        );
     }
 }
