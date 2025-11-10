@@ -1,14 +1,13 @@
 package com.pyxis.backend.message;
 
+import com.pyxis.backend.ai.AiService;
+import com.pyxis.backend.ai.dto.AiChatRequest;
 import com.pyxis.backend.chat.botchat.BotchatRepository;
 import com.pyxis.backend.chat.botchat.entity.Botchat;
 import com.pyxis.backend.common.dto.PageResponse;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
-import com.pyxis.backend.message.dto.BotMessageResponse;
-import com.pyxis.backend.message.dto.ChatMessageRequest;
-import com.pyxis.backend.message.dto.ChatMessageResponse;
-import com.pyxis.backend.message.dto.SourceData;
+import com.pyxis.backend.message.dto.*;
 import com.pyxis.backend.message.entity.BotMessage;
 import com.pyxis.backend.user.UserRepository;
 import com.pyxis.backend.user.dto.SessionUser;
@@ -21,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 
 @Service
@@ -31,6 +32,8 @@ public class BotMessageService {
     private final BotchatRepository botchatRepository;
     private final UserRepository userRepository;
 
+    private final AiService aiService;
+
     @Transactional
     public ChatMessageResponse createChatbotMessage(Long chatbotId, @Valid ChatMessageRequest request, SessionUser user) {
         Botchat botchat = botchatRepository.findById(chatbotId).orElseThrow(
@@ -40,26 +43,51 @@ public class BotMessageService {
                 () -> new CustomException(ErrorType.USER_NOT_FOUND)
         );
 
-        // restTemplate or WebClient 사용해서 통신 < 이후 개발 예정 >
+        // ai service
+        List<BotMessage> previousMessages = botMessageRepository
+                .findByBotchatIdOrderByCreatedAtAsc(botchat.getId());
 
-
-        // 더미데이터
-
-        SourceData sourceData = SourceData.builder()
-                .title("ㅎㅇ")
-                .source("sorce 입니다.")
-                .snippet("snippet 입니다.")
-                .url("http://더미데이터")
+        AiChatRequest.UserInfo userInfo = AiChatRequest.UserInfo.builder()
+                .loginId(users.getLoginId())
+                .nickname(users.getNickname())
                 .build();
-        List<SourceData> ListSource = List.of(sourceData);
+
+        List<AiChatRequest.SessionHistory> sessionHistory = previousMessages.stream()
+                .flatMap(msg -> Stream.of(
+                        AiChatRequest.SessionHistory.builder()
+                                .role("user")
+                                .content(msg.getUserQuery())
+                                .build(),
+                        AiChatRequest.SessionHistory.builder()
+                                .role("assistant")
+                                .content(msg.getBotResponse())
+                                .build()
+                )).toList();
+
+        AiChatRequest aiChatRequest = AiChatRequest.builder()
+                .user(userInfo)
+                .query(request.getUserQuery())
+                .sessionHistory(sessionHistory)
+                .build();
+
+        BotResponse aiResponse = aiService.chat(aiChatRequest);
 
         BotMessage message = botMessageRepository.save(BotMessage.builder()
                 .botchat(botchat)
                 .user(users)
                 .userQuery(request.getUserQuery())
-                .botResponse("1")
-                .sourceData(ListSource)
+                .botResponse(aiResponse.getBotResponse())
+                .sourceData(convertToSourceDataList(aiResponse.getSourceData()))
                 .build());
+
+        // 썸네일 제목
+        String userQuery = Optional.ofNullable(request.getUserQuery()).orElse("").trim();
+        if (botchat.getTitle() == null || botchat.getTitle().trim().isEmpty()) {
+            String title = userQuery.length() > 30
+                    ? userQuery.substring(0, 30) + "..."
+                    : userQuery;
+            botchat.updateTitle(title);
+        }
 
         return ChatMessageResponse.of(message);
 
@@ -86,5 +114,20 @@ public class BotMessageService {
         return PageResponse.of(
                 botMessagePage.map(message -> BotMessageResponse.of(message, List.of()))
         );
+    }
+
+    private List<SourceData> convertToSourceDataList(List<BotResponse.SourceDataDto> dtos) {
+        if (dtos == null) {
+            return List.of();
+        }
+
+        return dtos.stream()
+                .map(dto -> SourceData.builder()
+                        .title(dto.getTitle())
+                        .source(dto.getSource())
+                        .url(dto.getUrl())
+                        .snippet(dto.getSnippet())
+                        .build())
+                .toList();
     }
 }

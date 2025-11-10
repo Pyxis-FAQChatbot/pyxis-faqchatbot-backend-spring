@@ -1,6 +1,5 @@
 package com.pyxis.backend.chat.botchat.dto;
 
-import com.pyxis.backend.chat.botchat.entity.Botchat;
 import lombok.Builder;
 import lombok.Getter;
 

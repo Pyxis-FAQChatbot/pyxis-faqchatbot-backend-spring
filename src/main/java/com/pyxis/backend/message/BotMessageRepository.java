@@ -1,8 +1,6 @@
 package com.pyxis.backend.message;
 
-import com.pyxis.backend.chat.botchat.entity.Botchat;
 import com.pyxis.backend.message.entity.BotMessage;
-import com.pyxis.backend.user.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,5 +22,8 @@ public interface BotMessageRepository extends JpaRepository<BotMessage, Long> {
             @Param("userId") Long userId,
             Pageable pageable
     );
+
+    List<BotMessage> findByBotchatIdOrderByCreatedAtAsc(Long botchatId);
+
 
 }

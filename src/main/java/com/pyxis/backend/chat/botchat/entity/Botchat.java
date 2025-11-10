@@ -33,4 +33,7 @@ public class Botchat {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    public void updateTitle(String title) {
+        this.title = title;
+    }
 }
