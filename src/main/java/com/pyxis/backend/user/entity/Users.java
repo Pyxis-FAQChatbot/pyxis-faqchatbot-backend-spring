@@ -41,7 +41,7 @@ public class Users {
     private UserRole role;
 
     @Column(nullable = false, length = 20)
-    private LocalDate birth;
+    private LocalDate birthday;
 
     private String addressMain;
 

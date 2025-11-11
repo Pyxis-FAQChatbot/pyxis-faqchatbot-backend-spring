@@ -17,6 +17,7 @@ public enum ErrorType {
     USER_FORBIDDEN(HttpStatus.FORBIDDEN, " 접근 권한이 없습니다."),
     BOTCHAT_NOT_FOUND(HttpStatus.BAD_REQUEST, "채팅방이 존재하지 않습니다."),
 
+    GENDER_TYPE_ERROR(HttpStatus.BAD_REQUEST, "성별 타입이 맞지 않습니다."),
     AI_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI 서비스와 통신 중 오류가 발생했습니다.");
 
     private final HttpStatus status;

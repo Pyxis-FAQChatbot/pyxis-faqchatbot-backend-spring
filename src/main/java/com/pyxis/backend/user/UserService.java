@@ -38,7 +38,7 @@ public class UserService {
                 .nickname(request.getNickname())
                 .gender(GenderType.fromString(request.getGender()))
                 .role(UserRole.USER)
-                .birth(LocalDate.parse(request.getBirth()))
+                .birthday(LocalDate.parse(request.getBirthday()))
                 .addressMain(request.getAddressMain())
 
                 .build());

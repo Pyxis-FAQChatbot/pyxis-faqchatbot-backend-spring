@@ -1,6 +1,10 @@
 package com.pyxis.backend.user.entity;
 
+import com.pyxis.backend.common.exception.CustomException;
+import com.pyxis.backend.common.exception.ErrorType;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 public enum GenderType {
@@ -20,6 +24,6 @@ public enum GenderType {
                 return type;
             }
         }
-        throw new IllegalArgumentException("Unknown GenderType: " + genderType);
+        throw new CustomException(ErrorType.GENDER_TYPE_ERROR, List.of(genderType));
     }
 }

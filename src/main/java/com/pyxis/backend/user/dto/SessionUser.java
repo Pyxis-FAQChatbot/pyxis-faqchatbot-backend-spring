@@ -23,7 +23,7 @@ public class SessionUser implements Serializable {
     private String nickname;
     private UserRole role;
     private GenderType gender;
-    private LocalDate birth;
+    private LocalDate birthday;
     private String addressMain;
     private LocalDateTime createdAt;
 
@@ -34,7 +34,7 @@ public class SessionUser implements Serializable {
                 .nickname(user.getNickname())
                 .role(user.getRole())
                 .gender(user.getGender())
-                .birth(user.getBirth())
+                .birthday(user.getBirthday())
                 .addressMain(user.getAddressMain())
                 .createdAt(user.getCreatedAt())
                 .build();

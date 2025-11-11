@@ -17,7 +17,7 @@ public class SignupRequest {
     @NotBlank
     private String gender;
     @NotBlank
-    private String birth;
+    private String birthday;
     @NotBlank
     private String addressMain;
 
