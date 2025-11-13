@@ -1,9 +1,6 @@
 package com.pyxis.backend.message.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -21,6 +18,7 @@ public class BotResponse {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Builder
     public static class SourceDataDto {
         private String title;
         private String source;

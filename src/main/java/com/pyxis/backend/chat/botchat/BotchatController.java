@@ -55,4 +55,16 @@ public class BotchatController {
 
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/chatbot/{chatbotId}")
+    public ResponseEntity<?> deleteBotchat(@PathVariable("chatbotId") Long chatbotId, HttpSession session) {
+        SessionUser user = (SessionUser) session.getAttribute("user");
+        if (user == null) {
+            throw new CustomException(ErrorType.UNAUTHORIZED);
+        }
+
+        botchatService.deleteBotchat(user, chatbotId);
+
+        return ResponseEntity.ok().build();
+    }
 }

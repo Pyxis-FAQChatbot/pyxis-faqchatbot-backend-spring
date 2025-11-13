@@ -39,6 +39,18 @@ public class BotchatService {
         return CreateBotchatResponse.of(botchat);
     }
 
+    @Transactional
+    public void deleteBotchat(SessionUser sessionUser, Long chatbotId) {
+        Users user = userRepository.findById(sessionUser.getId())
+                .orElseThrow(() -> new CustomException(ErrorType.USER_NOT_FOUND));
+
+        Botchat botchat = botchatRepository.findByIdAndUser(chatbotId, user).orElseThrow(
+                () -> new CustomException(ErrorType.BOTCHAT_NOT_FOUND)
+        );
+
+        botchatRepository.delete(botchat);
+    }
+
     @Transactional(readOnly = true)
     public PageResponse<BotchatListResponse> getBotchatList(SessionUser sessionUser, Pageable pageable) {
         Page<BotchatListResponse> responsePage = botchatRepository.findByUserIdWithLastMessage(
@@ -48,4 +60,6 @@ public class BotchatService {
 
         return PageResponse.of(responsePage);
     }
+
+
 }

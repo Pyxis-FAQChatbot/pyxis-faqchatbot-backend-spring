@@ -1,5 +1,6 @@
 package com.pyxis.backend.chat.botchat.entity;
 
+import com.pyxis.backend.message.entity.BotMessage;
 import com.pyxis.backend.user.entity.Users;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,6 +31,10 @@ public class Botchat {
     private Users user;
 
     private String title;
+
+    @OneToMany(mappedBy = "botchat", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<BotMessage> messages = new ArrayList<>();
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
