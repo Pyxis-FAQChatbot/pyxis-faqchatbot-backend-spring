@@ -1,5 +1,6 @@
 package com.pyxis.backend.community.entity;
 
+import com.pyxis.backend.comment.entity.Comment;
 import com.pyxis.backend.community.dto.CommPostRequest;
 import com.pyxis.backend.user.entity.Users;
 import jakarta.persistence.*;
@@ -13,6 +14,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -42,6 +45,9 @@ public class CommPost {
 
     @Builder.Default
     private Long viewCount = 0L;
+
+    @OneToMany(mappedBy = "commPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
