@@ -20,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 @RequiredArgsConstructor
 public class CommPostService {
@@ -70,4 +71,18 @@ public class CommPostService {
 
         return PageResponse.of(pageCommPost.map(CommPostListResponse::of));
     }
+
+    @Transactional
+    public void deleteCommPost(Long communityId, SessionUser sessionUser) {
+
+        CommPost commPost = commPostRepository.findById(communityId)
+                .orElseThrow(() -> new CustomException(ErrorType.COMM_POST_NOT_FOUND));
+
+        if (!sessionUser.getId().equals(commPost.getUser().getId())) {
+            throw new CustomException(ErrorType.USER_FORBIDDEN);
+        }
+
+        commPostRepository.delete(commPost);
+    }
+
 }

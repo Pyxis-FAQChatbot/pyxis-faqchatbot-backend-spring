@@ -51,4 +51,16 @@ public class CommPostController {
 
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/community/{communityId}")
+    public ResponseEntity<?> deleteCommPost(@PathVariable Long communityId, HttpSession session) {
+        SessionUser user = (SessionUser) session.getAttribute("user");
+
+        if (user == null) {
+            throw new CustomException(ErrorType.UNAUTHORIZED);
+        }
+
+        commPostService.deleteCommPost(communityId, user);
+        return ResponseEntity.noContent().build();
+    }
 }
