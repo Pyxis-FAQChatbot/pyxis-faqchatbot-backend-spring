@@ -46,5 +46,9 @@ public class Comment {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }
 

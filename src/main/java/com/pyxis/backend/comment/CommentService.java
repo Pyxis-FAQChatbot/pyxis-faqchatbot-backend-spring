@@ -2,6 +2,7 @@ package com.pyxis.backend.comment;
 
 import com.pyxis.backend.comment.dto.CreateCommentRequest;
 import com.pyxis.backend.comment.dto.CreateCommentResponse;
+import com.pyxis.backend.comment.dto.UpdateCommentRequest;
 import com.pyxis.backend.comment.entity.Comment;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
@@ -56,8 +57,28 @@ public class CommentService {
         return CreateCommentResponse.of(saveComment, sessionUser);
     }
 
+    @Transactional
+    public void updateComment(Long communityId, Long commentId, UpdateCommentRequest request, SessionUser user) {
 
-    private Comment commentFindById(Long commentId){
+        // api APi request 안에 content 욕설 및 비방 검증 예정
+
+        CommPost commPost = commPostRepository.findById(communityId)
+                .orElseThrow(() -> new CustomException(ErrorType.COMM_POST_NOT_FOUND));
+
+        Comment comment = commentFindById(commentId);
+
+        if (!comment.getCommPost().getId().equals(commPost.getId())) {
+            throw new CustomException(ErrorType.COMMENT_NOT_IN_POST);
+        }
+
+        if (!comment.getUser().getId().equals(user.getId())) {
+            throw new CustomException(ErrorType.USER_FORBIDDEN);
+        }
+
+        comment.updateContent(request.getContent());
+    }
+
+    private Comment commentFindById(Long commentId) {
         return commentRepository.findById(commentId).orElseThrow(
                 () -> new CustomException(ErrorType.COMMENT_NOT_FOUND)
         );

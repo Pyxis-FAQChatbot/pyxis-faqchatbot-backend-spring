@@ -2,6 +2,7 @@ package com.pyxis.backend.comment;
 
 import com.pyxis.backend.comment.dto.CreateCommentRequest;
 import com.pyxis.backend.comment.dto.CreateCommentResponse;
+import com.pyxis.backend.comment.dto.UpdateCommentRequest;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
 import com.pyxis.backend.user.dto.SessionUser;
@@ -32,5 +33,20 @@ public class CommentController {
         CreateCommentResponse response = commentService.createComment(communityId, request, user);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/community/{communityId}/comment/{commentId}")
+    public ResponseEntity<?> updateComment(
+            @PathVariable Long communityId,
+            @PathVariable Long commentId,
+            @RequestBody @Valid UpdateCommentRequest request,
+            HttpSession session){
+        SessionUser user = (SessionUser) session.getAttribute("user");
+        if (user == null) {
+            throw new CustomException(ErrorType.UNAUTHORIZED);
+        }
+
+        commentService.updateComment(communityId, commentId, request, user);
+        return ResponseEntity.ok().build();
     }
 }
