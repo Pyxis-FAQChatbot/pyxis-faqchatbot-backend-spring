@@ -49,4 +49,20 @@ public class CommentController {
         commentService.updateComment(communityId, commentId, request, user);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/community/{communityId}/comment/{commentId}")
+    public ResponseEntity<?> deleteComment(
+            @PathVariable Long communityId,
+            @PathVariable Long commentId,
+            HttpSession session){
+        SessionUser user = (SessionUser) session.getAttribute("user");
+        if (user == null) {
+            throw new CustomException(ErrorType.UNAUTHORIZED);
+        }
+        commentService.deleteComment(communityId, commentId, user);
+
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

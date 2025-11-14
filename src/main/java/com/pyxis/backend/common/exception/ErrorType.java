@@ -22,8 +22,10 @@ public enum ErrorType {
     COMMENT_NOT_IN_POST(HttpStatus.BAD_REQUEST, "해당 게시글의 댓글이 아닙니다."),
     POST_TYPE_ERROR(HttpStatus.BAD_REQUEST, "게시글 타입이 맞지 않습니다."),
     GENDER_TYPE_ERROR(HttpStatus.BAD_REQUEST, "성별 타입이 맞지 않습니다."),
+    COMMENT_STATUS_TYPE_ERROR(HttpStatus.BAD_REQUEST, "댓글상태 타입이 맞지 않습니다"),
     AI_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI 서비스와 통신 중 오류가 발생했습니다."),
-    INVALID_PARENT_COMMENT(HttpStatus.BAD_REQUEST, "부모 댓글이 현재 게시글에 속해 있지 않습니다");
+    INVALID_PARENT_COMMENT(HttpStatus.BAD_REQUEST, "부모 댓글이 현재 게시글에 속해 있지 않습니다"),
+    COMMENT_CANNOT_MODIFY(HttpStatus.BAD_REQUEST, "삭제되었거나 차단된 댓글은 수정/삭제할 수 없습니다.");
 
     private final HttpStatus status;
     private final String description;

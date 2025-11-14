@@ -40,6 +40,11 @@ public class Comment {
     @Column(nullable = false)
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private CommentStatus status = CommentStatus.ACTIVE;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -49,6 +54,10 @@ public class Comment {
 
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public void delete() {
+        this.status =  CommentStatus.DELETED;
     }
 }
 
