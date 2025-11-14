@@ -16,6 +16,7 @@ public enum ErrorType {
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
     USER_FORBIDDEN(HttpStatus.FORBIDDEN, " 접근 권한이 없습니다."),
     BOTCHAT_NOT_FOUND(HttpStatus.BAD_REQUEST, "채팅방이 존재하지 않습니다."),
+    COMM_POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "커뮤니티 게시글이 존재하지 않습니다."),
 
     POST_TYPE_ERROR(HttpStatus.BAD_REQUEST, "게시글 타입이 맞지 않습니다."),
     GENDER_TYPE_ERROR(HttpStatus.BAD_REQUEST, "성별 타입이 맞지 않습니다."),

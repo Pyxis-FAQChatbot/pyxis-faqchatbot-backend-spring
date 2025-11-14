@@ -4,6 +4,7 @@ import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
 import com.pyxis.backend.community.dto.CreateCommPostRequest;
 import com.pyxis.backend.community.dto.CreateCommPostResponse;
+import com.pyxis.backend.community.dto.GetCommPostResponse;
 import com.pyxis.backend.community.entity.CommPost;
 import com.pyxis.backend.community.entity.PostType;
 import com.pyxis.backend.user.UserRepository;
@@ -38,5 +39,18 @@ public class CommPostService {
 
 
         return CreateCommPostResponse.from(saveCommPost);
+    }
+
+    @Transactional
+    public GetCommPostResponse getCommPost(Long communityId) {
+
+        commPostRepository.incrementViewCount(communityId);
+
+        CommPost commPost = commPostRepository.findById(communityId).orElseThrow(
+                () -> new CustomException(ErrorType.COMM_POST_NOT_FOUND)
+        );
+        Users user = commPost.getUser();
+
+        return GetCommPostResponse.from(user, commPost);
     }
 }
