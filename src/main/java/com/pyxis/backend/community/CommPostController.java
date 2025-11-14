@@ -2,7 +2,7 @@ package com.pyxis.backend.community;
 
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
-import com.pyxis.backend.community.dto.CreateCommPostRequest;
+import com.pyxis.backend.community.dto.CommPostRequest;
 import com.pyxis.backend.community.dto.CreateCommPostResponse;
 import com.pyxis.backend.community.dto.GetCommPostResponse;
 import com.pyxis.backend.user.dto.SessionUser;
@@ -22,7 +22,7 @@ public class CommPostController {
 
     @PostMapping("/community")
     public ResponseEntity<CreateCommPostResponse> createCommPost(
-            @RequestBody @Valid CreateCommPostRequest request,
+            @RequestBody @Valid CommPostRequest request,
             HttpSession session) {
         SessionUser user = (SessionUser) session.getAttribute("user");
 
@@ -61,6 +61,20 @@ public class CommPostController {
         }
 
         commPostService.deleteCommPost(communityId, user);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/community/{communityId}")
+    public ResponseEntity<?> updateCommPost(@PathVariable Long communityId, @RequestBody
+    CommPostRequest request, HttpSession session) {
+        SessionUser user = (SessionUser) session.getAttribute("user");
+
+        if (user == null) {
+            throw new CustomException(ErrorType.UNAUTHORIZED);
+        }
+
+        commPostService.updateCommPost(communityId, request, user.getId());
+
         return ResponseEntity.noContent().build();
     }
 }

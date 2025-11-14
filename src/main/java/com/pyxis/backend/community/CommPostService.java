@@ -4,7 +4,7 @@ import com.pyxis.backend.common.dto.PageResponse;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
 import com.pyxis.backend.community.dto.CommPostListResponse;
-import com.pyxis.backend.community.dto.CreateCommPostRequest;
+import com.pyxis.backend.community.dto.CommPostRequest;
 import com.pyxis.backend.community.dto.CreateCommPostResponse;
 import com.pyxis.backend.community.dto.GetCommPostResponse;
 import com.pyxis.backend.community.entity.CommPost;
@@ -29,7 +29,7 @@ public class CommPostService {
     private final UserRepository userRepository;
 
     @Transactional
-    public CreateCommPostResponse createCommPost(CreateCommPostRequest request, SessionUser user) {
+    public CreateCommPostResponse createCommPost(CommPostRequest request, SessionUser user) {
 
         // ai api 욕설 필터링 검증 (비동기 방식)
 
@@ -85,4 +85,17 @@ public class CommPostService {
         commPostRepository.delete(commPost);
     }
 
+    @Transactional
+    public void updateCommPost(Long communityId, CommPostRequest request, Long sessionUserId) {
+        // ai api 욕설 필터링 검증 (비동기 방식)
+
+        CommPost commPost = commPostRepository.findById(communityId)
+                .orElseThrow(() -> new CustomException(ErrorType.COMM_POST_NOT_FOUND));
+
+        if (!sessionUserId.equals(commPost.getUser().getId())) {
+            throw new CustomException(ErrorType.USER_FORBIDDEN);
+        }
+
+        commPost.update(request);
+    }
 }

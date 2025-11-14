@@ -1,5 +1,6 @@
 package com.pyxis.backend.community.entity;
 
+import com.pyxis.backend.community.dto.CommPostRequest;
 import com.pyxis.backend.user.entity.Users;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -30,6 +31,7 @@ public class CommPost {
     private Users user;
 
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     private PostType postType = PostType.DEFAULT;
 
     @NotBlank
@@ -47,4 +49,16 @@ public class CommPost {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    public void update(CommPostRequest request) {
+        if (request.title() != null) {
+            this.title = request.title();
+        }
+        if (request.content() != null) {
+            this.content = request.content();
+        }
+        if (request.postType() != null) {
+            this.postType = PostType.fromString(request.postType());
+        }
+    }
 }
