@@ -46,7 +46,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .distinct()
                 .toList();
 
-        Map<String, Object> body = baseBody("BAD_REQUEST", "회원가입에 실패하였습니다.");
+        Map<String, Object> body = baseBody("BAD_REQUEST", "요청 값이 올바르지 않습니다.");
         putIfNotEmpty(body, Map.of("missing_fields", missingFields));
         return ResponseEntity.badRequest().body(body);
     }
