@@ -41,4 +41,14 @@ public class CommPostController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/community/posts")
+    public ResponseEntity<?> getCommPostList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        var response = commPostService.getCommPostList(page, size);
+
+        return ResponseEntity.ok(response);
+    }
 }

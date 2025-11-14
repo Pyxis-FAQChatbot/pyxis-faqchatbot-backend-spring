@@ -1,7 +1,9 @@
 package com.pyxis.backend.community;
 
+import com.pyxis.backend.common.dto.PageResponse;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
+import com.pyxis.backend.community.dto.CommPostListResponse;
 import com.pyxis.backend.community.dto.CreateCommPostRequest;
 import com.pyxis.backend.community.dto.CreateCommPostResponse;
 import com.pyxis.backend.community.dto.GetCommPostResponse;
@@ -11,6 +13,10 @@ import com.pyxis.backend.user.UserRepository;
 import com.pyxis.backend.user.dto.SessionUser;
 import com.pyxis.backend.user.entity.Users;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,5 +58,16 @@ public class CommPostService {
         Users user = commPost.getUser();
 
         return GetCommPostResponse.from(user, commPost);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<CommPostListResponse> getCommPostList(int page, int size) {
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<CommPost> pageCommPost = commPostRepository.findAllWithUser(pageable);
+
+        return PageResponse.of(pageCommPost.map(CommPostListResponse::of));
     }
 }
