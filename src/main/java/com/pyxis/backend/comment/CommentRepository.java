@@ -1,7 +1,9 @@
 package com.pyxis.backend.comment;
 
+import com.pyxis.backend.comment.entity.Comment;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CommentRepository {
+public interface CommentRepository extends JpaRepository<Comment, Long> {
 }

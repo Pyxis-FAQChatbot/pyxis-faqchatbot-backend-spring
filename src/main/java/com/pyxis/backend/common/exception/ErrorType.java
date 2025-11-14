@@ -18,9 +18,12 @@ public enum ErrorType {
     BOTCHAT_NOT_FOUND(HttpStatus.BAD_REQUEST, "채팅방이 존재하지 않습니다."),
     COMM_POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "커뮤니티 게시글이 존재하지 않습니다."),
 
+    COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "댓글이 존재하지 않습니다."),
+
     POST_TYPE_ERROR(HttpStatus.BAD_REQUEST, "게시글 타입이 맞지 않습니다."),
     GENDER_TYPE_ERROR(HttpStatus.BAD_REQUEST, "성별 타입이 맞지 않습니다."),
-    AI_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI 서비스와 통신 중 오류가 발생했습니다.");
+    AI_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI 서비스와 통신 중 오류가 발생했습니다."),
+    INVALID_PARENT_COMMENT(HttpStatus.BAD_REQUEST, "부모 댓글이 현재 게시글에 속해 있지 않습니다");
 
     private final HttpStatus status;
     private final String description;
