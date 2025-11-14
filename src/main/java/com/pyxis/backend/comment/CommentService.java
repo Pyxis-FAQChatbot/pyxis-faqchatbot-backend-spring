@@ -1,10 +1,12 @@
 package com.pyxis.backend.comment;
 
+import com.pyxis.backend.comment.dto.CommentListResponse;
 import com.pyxis.backend.comment.dto.CreateCommentRequest;
 import com.pyxis.backend.comment.dto.CreateCommentResponse;
 import com.pyxis.backend.comment.dto.UpdateCommentRequest;
 import com.pyxis.backend.comment.entity.Comment;
 import com.pyxis.backend.comment.entity.CommentStatus;
+import com.pyxis.backend.common.dto.PageResponse;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
 import com.pyxis.backend.community.CommPostRepository;
@@ -13,6 +15,10 @@ import com.pyxis.backend.user.UserRepository;
 import com.pyxis.backend.user.dto.SessionUser;
 import com.pyxis.backend.user.entity.Users;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,8 +70,40 @@ public class CommentService {
 
         Comment comment = validateCommentAccess(communityId, commentId, user);
 
-        comment.delete(); // Soft delete
+        comment.delete();
     }
+
+    @Transactional(readOnly = true)
+    public PageResponse<CommentListResponse> getCommentList(
+            Long communityId,
+            Long parentId,
+            int page,
+            int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+
+        Page<Comment> commentPage;
+
+        if (parentId == null) {
+            // 최상위 댓글 조회
+            commentPage = commentRepository
+                    .findByCommPostIdAndParentCommentIsNull(communityId, pageable);
+        } else {
+            // 대댓글 조회
+            commentPage = commentRepository
+                    .findByParentCommentId(parentId, pageable);
+        }
+
+        Page<CommentListResponse> mapped = commentPage.map(
+                c -> CommentListResponse.from(
+                        c,
+                        commentRepository.countChildComments(c.getId())
+                )
+        );
+
+        return PageResponse.of(mapped);
+    }
+
 
 
     /**

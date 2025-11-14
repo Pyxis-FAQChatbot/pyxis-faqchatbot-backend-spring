@@ -1,8 +1,10 @@
 package com.pyxis.backend.comment;
 
+import com.pyxis.backend.comment.dto.CommentListResponse;
 import com.pyxis.backend.comment.dto.CreateCommentRequest;
 import com.pyxis.backend.comment.dto.CreateCommentResponse;
 import com.pyxis.backend.comment.dto.UpdateCommentRequest;
+import com.pyxis.backend.common.dto.PageResponse;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
 import com.pyxis.backend.user.dto.SessionUser;
@@ -65,4 +67,16 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/community/{communityId}/comment")
+    public ResponseEntity<PageResponse<CommentListResponse>> getCommentList(
+            @PathVariable Long communityId,
+            @RequestParam(required = false) Long parentId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        PageResponse<CommentListResponse> response =
+                commentService.getCommentList(communityId, parentId, page, size);
+
+        return ResponseEntity.ok(response);
+    }
 }
