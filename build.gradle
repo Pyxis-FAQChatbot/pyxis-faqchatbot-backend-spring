@@ -41,6 +41,26 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // --- QueryDSL (Jakarta + Spring Boot 3.x) ---
+    implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
+    annotationProcessor 'com.querydsl:querydsl-apt:5.1.0:jakarta'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+}
+
+def generated = "src/main/generated"
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ["-Aquerydsl.generatedSourcesDir=${generated}"]
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += generated
+        }
+    }
 }
 
 tasks.named('test') {

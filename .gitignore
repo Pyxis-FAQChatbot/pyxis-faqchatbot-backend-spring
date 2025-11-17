@@ -36,6 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-
+/src/main/generated/
 # Secret config (local only)
 application-secret.yml
