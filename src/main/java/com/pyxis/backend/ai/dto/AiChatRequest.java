@@ -15,7 +15,6 @@ public class AiChatRequest {
 
     private UserInfo user;
     private String query;
-    private List<SessionHistory> sessionHistory;
 
     // ✅ 내부 클래스: UserInfo
     @Getter

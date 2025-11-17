@@ -45,16 +45,15 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
                                    HttpSession session,
-                                   HttpServletResponse response) {  // ✅ HttpServletResponse 추가
+                                   HttpServletResponse response) {
         SessionUser sessionUser = SessionUser.from(userService.login(request));
         session.setAttribute("user", sessionUser);
 
-        // ✅ ResponseCookie로 SameSite=None 강제 설정
         ResponseCookie cookie = ResponseCookie.from("JSESSIONID", session.getId())
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("None")  // ✅ 핵심!
+                .sameSite("None")
                 .maxAge(60 * 60 * 24)  // 24시간
                 .build();
 

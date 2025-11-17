@@ -44,30 +44,14 @@ public class BotMessageService {
         );
 
         // ai service
-        List<BotMessage> previousMessages = botMessageRepository
-                .findByBotchatIdOrderByCreatedAtAsc(botchat.getId());
-
         AiChatRequest.UserInfo userInfo = AiChatRequest.UserInfo.builder()
                 .loginId(users.getLoginId())
                 .nickname(users.getNickname())
                 .build();
 
-        List<AiChatRequest.SessionHistory> sessionHistory = previousMessages.stream()
-                .flatMap(msg -> Stream.of(
-                        AiChatRequest.SessionHistory.builder()
-                                .role("user")
-                                .content(msg.getUserQuery())
-                                .build(),
-                        AiChatRequest.SessionHistory.builder()
-                                .role("assistant")
-                                .content(msg.getBotResponse())
-                                .build()
-                )).toList();
-
         AiChatRequest aiChatRequest = AiChatRequest.builder()
                 .user(userInfo)
                 .query(request.getUserQuery())
-                .sessionHistory(sessionHistory)
                 .build();
 
         BotResponse aiResponse = aiService.chat(aiChatRequest);

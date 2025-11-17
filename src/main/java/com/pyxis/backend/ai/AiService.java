@@ -19,9 +19,7 @@ public class AiService {
 
     public BotResponse chat(AiChatRequest request) {
         try {
-            log.info("AI API 호출 - query: {}, historySize: {}",
-                    request.getQuery(),
-                    request.getSessionHistory().size());
+            log.info("ClientQuery : {}",request.getQuery());
 
             BotResponse response = webClient.post()
                     .uri("/api/v1/query")  // ✅ AI API 엔드포인트

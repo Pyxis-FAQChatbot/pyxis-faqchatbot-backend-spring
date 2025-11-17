@@ -45,7 +45,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Users  login(@Valid LoginRequest request) {
+    public Users login(@Valid LoginRequest request) {
         Users user = userRepository.findByLoginId(request.getLoginId())
                 .orElseThrow(() -> new CustomException(ErrorType.USER_NOT_FOUND));
 
