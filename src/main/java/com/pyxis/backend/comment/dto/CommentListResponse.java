@@ -1,10 +1,10 @@
 package com.pyxis.backend.comment.dto;
 
-import com.pyxis.backend.comment.entity.Comment;
 import com.pyxis.backend.comment.entity.CommentStatus;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Getter
@@ -19,28 +19,34 @@ public class CommentListResponse {
     private int childCommentCount;
     private LocalDateTime createdAt;
 
-    public static CommentListResponse from(Comment comment, int childCount) {
-        String content;
+    public static CommentListResponse from(Object[] r, int childCount) {
 
-        if (comment.getStatus() == CommentStatus.BLOCKED) {
-            // 관리자 또는 신고 누적으로 숨김 처리된 경우
-            content = "욕설 또는 부적절한 표현으로 인해 가려진 댓글입니다.";
-        } else if (comment.getStatus() == CommentStatus.DELETED) {
-            // 사용자가 직접 삭제한 경우
-            content = "삭제된 댓글입니다.";
+        Long id = ((Number) r[0]).longValue();
+        String content = (String) r[1];
+        Long userId = ((Number) r[2]).longValue();
+        String nickname = (String) r[3];
+        String status = (String) r[4];
+        LocalDateTime createdAt = ((Timestamp) r[5]).toLocalDateTime();
+
+        CommentStatus enumStatus = CommentStatus.valueOf(status);
+
+        String displayContent;
+        if (enumStatus == CommentStatus.DELETED) {
+            displayContent = "삭제된 댓글입니다.";
+        } else if (enumStatus == CommentStatus.BLOCKED) {
+            displayContent = "욕설 또는 부적절한 표현으로 인해 가려진 댓글입니다.";
         } else {
-            // 정상 댓글
-            content = comment.getContent();
+            displayContent = content;
         }
 
         return CommentListResponse.builder()
-                .commentId(comment.getId())
-                .content(content)
-                .userId(comment.getUser().getId())
-                .nickname(comment.getUser().getNickname())
-                .status(comment.getStatus())
+                .commentId(id)
+                .content(displayContent)
+                .userId(userId)
+                .nickname(nickname)
+                .status(enumStatus)
                 .childCommentCount(childCount)
-                .createdAt(comment.getCreatedAt())
+                .createdAt(createdAt)
                 .build();
     }
 }

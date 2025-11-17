@@ -15,12 +15,13 @@ import com.pyxis.backend.user.UserRepository;
 import com.pyxis.backend.user.dto.SessionUser;
 import com.pyxis.backend.user.entity.Users;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -75,36 +76,50 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public PageResponse<CommentListResponse> getCommentList(
-            Long communityId,
+            Long postId,
             Long parentId,
             int page,
             int size
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+        int offset = page * size;
 
-        Page<Comment> commentPage;
+        List<Object[]> rows;
+        long total;
 
         if (parentId == null) {
-            // 최상위 댓글 조회
-            commentPage = commentRepository
-                    .findByCommPostIdAndParentCommentIsNull(communityId, pageable);
+            rows = commentRepository.findTopComments(postId, size, offset);
+            total = commentRepository.countTopComments(postId);
         } else {
-            // 대댓글 조회
-            commentPage = commentRepository
-                    .findByParentCommentId(parentId, pageable);
+            rows = commentRepository.findChildComments(parentId, size, offset);
+            total = commentRepository.countChildCommentsByParent(parentId);
         }
 
-        Page<CommentListResponse> mapped = commentPage.map(
-                c -> CommentListResponse.from(
-                        c,
-                        commentRepository.countChildComments(c.getId())
-                )
-        );
+        // 부모 댓글 / 대댓글 ID 목록 수집
+        List<Long> parentIds = rows.stream()
+                .map(r -> ((Number) r[0]).longValue())
+                .toList();
 
-        return PageResponse.of(mapped);
+        // 부모 댓글 ID가 없으면 → childCountMap도 비어있음
+        final Map<Long, Long> childCountMap =
+                parentIds.isEmpty()
+                        ? Collections.emptyMap()
+                        : commentRepository.countChildComments(parentIds)
+                        .stream()
+                        .collect(Collectors.toMap(
+                                r -> ((Number) r[0]).longValue(),
+                                r -> ((Number) r[1]).longValue()
+                        ));
+
+        List<CommentListResponse> list = rows.stream()
+                .map(r -> {
+                    Long id = ((Number) r[0]).longValue();
+                    int childCount = childCountMap.getOrDefault(id, 0L).intValue();
+                    return CommentListResponse.from(r, childCount);
+                })
+                .toList();
+
+        return PageResponse.of(list, page, size, total);
     }
-
-
 
     /**
      * 게시글 존재 여부 검증

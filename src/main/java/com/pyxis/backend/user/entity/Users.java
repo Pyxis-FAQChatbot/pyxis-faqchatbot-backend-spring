@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 public class Users {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 오라클 때 시퀀스로 변경예정
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true, length = 50)

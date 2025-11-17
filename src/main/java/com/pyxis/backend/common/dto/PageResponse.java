@@ -28,4 +28,20 @@ public class PageResponse<T> {
                 .items(page.getContent())
                 .build();
     }
+
+    public static <T> PageResponse<T> of(List<T> items, int page, int size, long totalElements) {
+
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        return PageResponse.<T>builder()
+                .currentPage(page)
+                .totalPages(totalPages)
+                .totalElements(totalElements)
+                .size(size)
+                .first(page == 0)
+                .last(page + 1 == totalPages)
+                .items(items)
+                .build();
+
+    }
 }
