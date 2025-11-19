@@ -18,10 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +27,8 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final CommPostRepository commPostRepository;
     private final UserRepository userRepository;
+
+    private final CommentQueryRepository commentQueryRepository;
 
     @Transactional
     public CreateCommentResponse createComment(Long communityId, CreateCommentRequest request, SessionUser sessionUser) {
@@ -51,6 +50,10 @@ public class CommentService {
                 .content(request.getContent())
                 .status(CommentStatus.ACTIVE)
                 .build();
+
+        if(parent != null) {
+            commentRepository.increaseChildCount(parent.getId());
+        }
 
         Comment saved = commentRepository.save(comment);
 
@@ -75,48 +78,18 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<CommentListResponse> getCommentList(
-            Long postId,
-            Long parentId,
-            int page,
-            int size
-    ) {
-        int offset = page * size;
+    public PageResponse<CommentListResponse> getCommentList(Long postId, Long parentId, int page, int size) {
 
-        List<Object[]> rows;
+        List<CommentListResponse> list;
+
         long total;
-
         if (parentId == null) {
-            rows = commentRepository.findTopComments(postId, size, offset);
-            total = commentRepository.countTopComments(postId);
+            list = commentQueryRepository.getTopComments(postId, page, size);
+            total = commentQueryRepository.countTopComments(postId);
         } else {
-            rows = commentRepository.findChildComments(parentId, size, offset);
-            total = commentRepository.countChildCommentsByParent(parentId);
+            list = commentQueryRepository.getChildComments(parentId, page, size);
+            total = commentQueryRepository.countChildComments(parentId);
         }
-
-        // 부모 댓글 / 대댓글 ID 목록 수집
-        List<Long> parentIds = rows.stream()
-                .map(r -> ((Number) r[0]).longValue())
-                .toList();
-
-        // 부모 댓글 ID가 없으면 → childCountMap도 비어있음
-        final Map<Long, Long> childCountMap =
-                parentIds.isEmpty()
-                        ? Collections.emptyMap()
-                        : commentRepository.countChildComments(parentIds)
-                        .stream()
-                        .collect(Collectors.toMap(
-                                r -> ((Number) r[0]).longValue(),
-                                r -> ((Number) r[1]).longValue()
-                        ));
-
-        List<CommentListResponse> list = rows.stream()
-                .map(r -> {
-                    Long id = ((Number) r[0]).longValue();
-                    int childCount = childCountMap.getOrDefault(id, 0L).intValue();
-                    return CommentListResponse.from(r, childCount);
-                })
-                .toList();
 
         return PageResponse.of(list, page, size, total);
     }

@@ -62,12 +62,21 @@ public class CommPostService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<CommPostListResponse> getCommPostList(int page, int size) {
+    public PageResponse<CommPostListResponse> getCommPostList(int page, int size, String type) {
 
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<CommPost> pageCommPost = commPostRepository.findAllWithUser(pageable);
+
+        Page<CommPost> pageCommPost;
+        if (null == type || type.isEmpty()) {
+            // 전체 목록 조회
+            pageCommPost = commPostRepository.findAllWithUser(pageable);
+        } else {
+            // 타입별 목록 조회
+            PostType postType = PostType.fromString(type);
+            pageCommPost = commPostRepository.findAllByPostTypeWithUser(postType, pageable);
+        }
 
         return PageResponse.of(pageCommPost.map(CommPostListResponse::of));
     }

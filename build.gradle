@@ -52,7 +52,7 @@ dependencies {
 def generated = "src/main/generated"
 
 tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs += ["-Aquerydsl.generatedSourcesDir=${generated}"]
+    options.annotationProcessorGeneratedSourcesDirectory = file(generated)
 }
 
 sourceSets {

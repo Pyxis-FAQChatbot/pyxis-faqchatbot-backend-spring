@@ -1,11 +1,13 @@
 package com.pyxis.backend.community;
 
 import com.pyxis.backend.community.entity.CommPost;
+import com.pyxis.backend.community.entity.PostType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -20,4 +22,11 @@ public interface CommPostRepository extends JpaRepository<CommPost, Long> {
             countQuery = "SELECT COUNT(c) FROM CommPost c"
     )
     Page<CommPost> findAllWithUser(Pageable pageable);
+
+    @Query(
+            value = "SELECT c FROM CommPost c JOIN FETCH c.user WHERE c.postType = :postType",
+            countQuery = "SELECT COUNT(c) FROM CommPost c WHERE c.postType = :postType"
+    )
+    Page<CommPost> findAllByPostTypeWithUser(@Param("postType") PostType postType, Pageable pageable);
+
 }

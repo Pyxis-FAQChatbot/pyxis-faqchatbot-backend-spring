@@ -45,6 +45,10 @@ public class Comment {
     @Builder.Default
     private CommentStatus status = CommentStatus.ACTIVE;
 
+    @Column(nullable = false)
+    private int childCount = 0;
+
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
