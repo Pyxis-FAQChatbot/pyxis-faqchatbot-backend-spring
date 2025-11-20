@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: pyxis-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 12
+      MYSQL_DATABASE: pyxis
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build: .
+    container_name: pyxis-backend
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/pyxis?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 12
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:

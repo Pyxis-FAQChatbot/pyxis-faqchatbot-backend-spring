@@ -1,0 +1,21 @@
+# 빌드/캐시 제거
+.gradle
+build
+out
+
+# IDE
+.idea
+*.iml
+
+# Git
+.git
+.gitignore
+
+# Node 등
+node_modules
+
+# 민감정보 파일 (절대 Docker 이미지에 포함 금지)
+src/main/resources/application-secret.yml
+src/main/resources/application.properties
+src/main/resources/application.yml
+.env
