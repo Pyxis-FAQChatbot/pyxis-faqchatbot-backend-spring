@@ -1,14 +1,22 @@
 package com.pyxis.backend.ai;
 
+import com.pyxis.backend.ai.dto.AbuseFilterRequest;
+import com.pyxis.backend.ai.dto.AbuseFilterResponse;
 import com.pyxis.backend.ai.dto.AiChatRequest;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
 import com.pyxis.backend.message.dto.BotResponse;
+import com.pyxis.backend.user.dto.SessionUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
+
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -42,4 +50,23 @@ public class AiService {
             throw new CustomException(ErrorType.AI_API_ERROR);
         }
     }
+
+    @Async("asyncExecutor")
+    public CompletableFuture<AbuseFilterResponse> filterTextAsync(SessionUser sessionUser,
+                                                                  String query) {
+
+        AbuseFilterRequest request = AbuseFilterRequest.of(sessionUser, query);
+
+        return webClient.post()
+                .uri("/api/v1/filter/text")
+                .bodyValue(request)
+                .retrieve()
+                // 4xx / 5xx일 때 처리 (원하면 커스텀 예외로 감싸기)
+                .onStatus(HttpStatusCode::isError, clientResponse ->
+                        clientResponse.createException().flatMap(Mono::error)
+                )
+                .bodyToMono(AbuseFilterResponse.class)
+                .toFuture(); // Mono -> CompletableFuture 로 변환
+    }
+
 }

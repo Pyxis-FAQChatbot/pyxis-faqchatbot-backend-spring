@@ -52,7 +52,7 @@ public class UserController {
         ResponseCookie cookie = ResponseCookie.from("JSESSIONID", session.getId())
                 .path("/")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .sameSite("None")
                 .maxAge(60 * 60 * 24)  // 24시간
                 .build();

@@ -25,14 +25,4 @@ public class AiChatRequest {
         private String loginId;
         private String nickname;
     }
-
-    // ✅ 내부 클래스: SessionHistory
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class SessionHistory {
-        private String role;      // "user" 또는 "assistant"
-        private String content;   // 대화 내용
-    }
 }

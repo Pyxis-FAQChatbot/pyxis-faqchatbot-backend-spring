@@ -15,6 +15,7 @@ public class CommPostListResponse {
     private String nickname;
     private PostType postType;
     private String title;
+    private String content;
     private Long viewCount;
     private LocalDateTime createdAt;
 
@@ -24,6 +25,7 @@ public class CommPostListResponse {
                 .nickname(commPost.getUser().getNickname())
                 .postType(commPost.getPostType())
                 .title(commPost.getTitle())
+                .content(commPost.getContent())
                 .viewCount(commPost.getViewCount())
                 .createdAt(commPost.getCreatedAt())
                 .build();

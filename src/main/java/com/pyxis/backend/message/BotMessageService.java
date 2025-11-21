@@ -65,12 +65,8 @@ public class BotMessageService {
                 .build());
 
         // 썸네일 제목
-        String userQuery = Optional.ofNullable(request.getUserQuery()).orElse("").trim();
         if (botchat.getTitle() == null || botchat.getTitle().trim().isEmpty()) {
-            String title = userQuery.length() > 30
-                    ? userQuery.substring(0, 30) + "..."
-                    : userQuery;
-            botchat.updateTitle(title);
+            botchat.updateTitle(aiResponse.getQueryTitle());
         }
 
         return ChatMessageResponse.of(message);

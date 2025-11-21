@@ -29,6 +29,7 @@ public class CommPostService {
     private final UserRepository userRepository;
 
     private final CommPostQueryRepository commPostQueryRepository;
+
     @Transactional
     public CreateCommPostResponse createCommPost(CommPostRequest request, SessionUser user) {
 

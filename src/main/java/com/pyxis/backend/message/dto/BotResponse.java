@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BotResponse {
 
+    private String queryTitle;
     private List<SourceDataDto> sourceData;
     private String botResponse;
     private List<String> followUpQuestions;

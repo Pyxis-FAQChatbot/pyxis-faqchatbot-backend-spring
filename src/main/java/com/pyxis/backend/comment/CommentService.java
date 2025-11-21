@@ -1,5 +1,7 @@
 package com.pyxis.backend.comment;
 
+import com.pyxis.backend.ai.AiService;
+import com.pyxis.backend.ai.dto.AbuseFilterResponse;
 import com.pyxis.backend.comment.dto.CommentListResponse;
 import com.pyxis.backend.comment.dto.CreateCommentRequest;
 import com.pyxis.backend.comment.dto.CreateCommentResponse;
@@ -17,6 +19,8 @@ import com.pyxis.backend.user.entity.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
@@ -28,7 +32,9 @@ public class CommentService {
     private final CommPostRepository commPostRepository;
     private final UserRepository userRepository;
 
-    private final CommentQueryRepository commentQueryRepository;
+    private final CommentQueryRepositoryImpl commentQueryRepositoryImpl;
+
+    private final AiService aiService;
 
     @Transactional
     public CreateCommentResponse createComment(Long communityId, CreateCommentRequest request, SessionUser sessionUser) {
@@ -57,6 +63,18 @@ public class CommentService {
 
         Comment saved = commentRepository.save(comment);
 
+//        TransactionSynchronizationManager.registerSynchronization(
+//                new TransactionSynchronization() {
+//                    @Override
+//                    public void afterCommit() {
+//                        aiService.filterTextAsync(sessionUser, request.getContent())
+//                    .thenAccept(res -> {
+//                            updateCommentStatus(saved.getId(), res);
+//                        });
+//                    }
+//                }
+//        );
+
         return CreateCommentResponse.of(saved, sessionUser);
     }
 
@@ -84,11 +102,11 @@ public class CommentService {
 
         long total;
         if (parentId == null) {
-            list = commentQueryRepository.getTopComments(postId, page, size);
-            total = commentQueryRepository.countTopComments(postId);
+            list = commentQueryRepositoryImpl.getTopComments(postId, page, size);
+            total = commentQueryRepositoryImpl.countTopComments(postId);
         } else {
-            list = commentQueryRepository.getChildComments(parentId, page, size);
-            total = commentQueryRepository.countChildComments(parentId);
+            list = commentQueryRepositoryImpl.getChildComments(parentId, page, size);
+            total = commentQueryRepositoryImpl.countChildComments(parentId);
         }
 
         return PageResponse.of(list, page, size, total);
@@ -165,5 +183,14 @@ public class CommentService {
         validateCommentOwner(comment, user);
 
         return comment;
+    }
+
+    public void updateCommentStatus(Long commentId, AbuseFilterResponse res) {
+        if (res.isBlocked()) {
+            int updated = commentRepository.updateStatus(commentId, CommentStatus.BLOCKED);
+            if (updated == 0) {
+                throw new CustomException(ErrorType.COMMENT_NOT_FOUND);
+            }
+        }
     }
 }
