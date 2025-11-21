@@ -46,9 +46,10 @@ public class CommPostController {
     public ResponseEntity<?> getCommPostList(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String type) {
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String query) {
 
-        var response = commPostService.getCommPostList(page, size, type);
+        var response = commPostService.getCommPostList(page, size, type, query);
 
         return ResponseEntity.ok(response);
     }

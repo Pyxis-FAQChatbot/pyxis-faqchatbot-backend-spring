@@ -28,10 +28,9 @@ public class CommPostService {
     private final CommPostRepository commPostRepository;
     private final UserRepository userRepository;
 
+    private final CommPostQueryRepository commPostQueryRepository;
     @Transactional
     public CreateCommPostResponse createCommPost(CommPostRequest request, SessionUser user) {
-
-        // ai api 욕설 필터링 검증 (비동기 방식)
 
         Users users = userRepository.findById(user.getId()).orElseThrow(
                 () -> new CustomException(ErrorType.USER_NOT_FOUND)
@@ -62,23 +61,16 @@ public class CommPostService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<CommPostListResponse> getCommPostList(int page, int size, String type) {
+    public PageResponse<CommPostListResponse> getCommPostList(int page, int size, String type, String query) {
 
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(page, size, sort);
 
-
-        Page<CommPost> pageCommPost;
-        if (null == type || type.isEmpty()) {
-            // 전체 목록 조회
-            pageCommPost = commPostRepository.findAllWithUser(pageable);
-        } else {
-            // 타입별 목록 조회
-            PostType postType = PostType.fromString(type);
-            pageCommPost = commPostRepository.findAllByPostTypeWithUser(postType, pageable);
-        }
-
-        return PageResponse.of(pageCommPost.map(CommPostListResponse::of));
+        PostType postType = (type == null || type.isEmpty())
+                ? null
+                : PostType.fromString(type);
+        Page<CommPost> commPosts = commPostQueryRepository.searchPosts(postType, query, pageable);
+        return PageResponse.of(commPosts.map(CommPostListResponse::of));
     }
 
     @Transactional
@@ -96,7 +88,6 @@ public class CommPostService {
 
     @Transactional
     public void updateCommPost(Long communityId, CommPostRequest request, Long sessionUserId) {
-        // ai api 욕설 필터링 검증 (비동기 방식)
 
         CommPost commPost = commPostRepository.findById(communityId)
                 .orElseThrow(() -> new CustomException(ErrorType.COMM_POST_NOT_FOUND));
