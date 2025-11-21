@@ -14,16 +14,17 @@ public class ChatMessageResponse {
     private Long botMessageId;
     private String botResponse;
     private List<?> sourceData;
+    private List<String> followUpQuestions;
     private LocalDateTime createdAt;
 
-
-    public static ChatMessageResponse of(BotMessage botMessage) {
+    public static ChatMessageResponse of(BotMessage botMessage, List<String>  followUpQuestions) {
 
         return ChatMessageResponse.builder()
                 .botMessageId(botMessage.getId())
                 .botResponse(botMessage.getBotResponse())
                 .sourceData(botMessage.getSourceData())
                 .createdAt(botMessage.getCreatedAt())
+                .followUpQuestions(followUpQuestions)
                 .build();
     }
 }
