@@ -1,7 +1,11 @@
 package com.pyxis.backend.user;
 
+import com.pyxis.backend.comment.CommentService;
+import com.pyxis.backend.comment.dto.MyPageCommentListResponse;
+import com.pyxis.backend.common.dto.PageResponse;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
+import com.pyxis.backend.community.CommPostService;
 import com.pyxis.backend.user.dto.LoginRequest;
 import com.pyxis.backend.user.dto.SessionUser;
 import com.pyxis.backend.user.dto.SignupRequest;
@@ -22,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final CommentService commentService;
+    private final CommPostService commPostService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest request) {
@@ -62,7 +68,7 @@ public class UserController {
 
         // 디버깅용 로그
         System.out.println("Session ID: " + session.getId());
-        System.out.println("Set-Cookie: " + cookie.toString());
+        System.out.println("Set-Cookie: " + cookie);
 
         return ResponseEntity.ok().build();
     }
@@ -83,5 +89,31 @@ public class UserController {
         }
 
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/mypage/comments")
+    public ResponseEntity<PageResponse<MyPageCommentListResponse>> getMyComments(
+            HttpSession session,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        SessionUser user = (SessionUser) session.getAttribute("user");
+        if (user == null) {
+            throw new CustomException(ErrorType.UNAUTHORIZED);
+        }
+
+        return ResponseEntity.ok(commentService.getCommentsByUser(user, page, size));
+    }
+
+    @GetMapping("/mypage/posts")
+    public ResponseEntity<?> getMyPosts(
+            HttpSession session,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        SessionUser user = (SessionUser) session.getAttribute("user");
+        if (user == null) {
+            throw new CustomException(ErrorType.UNAUTHORIZED);
+        }
+        return ResponseEntity.ok(commPostService.getPostsByUser(user,page,size));
     }
 }

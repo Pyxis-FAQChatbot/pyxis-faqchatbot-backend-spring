@@ -3,10 +3,7 @@ package com.pyxis.backend.community;
 import com.pyxis.backend.common.dto.PageResponse;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
-import com.pyxis.backend.community.dto.CommPostListResponse;
-import com.pyxis.backend.community.dto.CommPostRequest;
-import com.pyxis.backend.community.dto.CreateCommPostResponse;
-import com.pyxis.backend.community.dto.GetCommPostResponse;
+import com.pyxis.backend.community.dto.*;
 import com.pyxis.backend.community.entity.CommPost;
 import com.pyxis.backend.community.entity.PostType;
 import com.pyxis.backend.user.UserRepository;
@@ -19,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Service
@@ -98,5 +97,13 @@ public class CommPostService {
         }
 
         commPost.update(request);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<MyPagePostListResponse> getPostsByUser(SessionUser user, int page, int size) {
+
+        List<MyPagePostListResponse> postsByUser = commPostQueryRepository.getPostsByUser(user, page, size);
+
+        return PageResponse.of(postsByUser, page, size, commPostQueryRepository.countCommentsByUserId(user.getId()));
     }
 }

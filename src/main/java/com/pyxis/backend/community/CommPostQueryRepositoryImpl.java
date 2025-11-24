@@ -1,8 +1,11 @@
 package com.pyxis.backend.community;
 
+import com.pyxis.backend.community.dto.MyPagePostListResponse;
+import com.pyxis.backend.community.dto.QMyPagePostListResponse;
 import com.pyxis.backend.community.entity.CommPost;
 import com.pyxis.backend.community.entity.PostType;
 import com.pyxis.backend.community.entity.QCommPost;
+import com.pyxis.backend.user.dto.SessionUser;
 import com.pyxis.backend.user.entity.QUsers;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -51,5 +54,42 @@ public class CommPostQueryRepositoryImpl implements CommPostQueryRepository{
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
+    }
+
+    @Override
+    public List<MyPagePostListResponse> getPostsByUser(SessionUser user, int page, int size) {
+
+        QCommPost c = QCommPost.commPost;
+        QUsers u = QUsers.users;
+
+        return queryFactory
+                .select(new QMyPagePostListResponse(
+                        c.id,
+                        c.title,
+                        c.content,
+                        c.postType,
+                        c.viewCount,
+                        c.createdAt
+                ))
+                .from(c)
+                .join(c.user, u)
+                .where(c.user.id.eq(user.getId()))
+                .orderBy(c.createdAt.desc())
+                .offset((long) page * size)
+                .limit(size)
+                .fetch();
+    }
+
+    @Override
+    public long countCommentsByUserId(Long userId) {
+        QCommPost c = QCommPost.commPost;
+
+        Long count =  queryFactory
+                .select(c.count())
+                .from(c)
+                .where(c.user.id.eq(userId))
+                .fetchOne();
+
+        return count != null ? count : 0L;
     }
 }

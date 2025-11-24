@@ -27,7 +27,7 @@ public class CommentService {
     private final CommPostRepository commPostRepository;
     private final UserRepository userRepository;
 
-    private final CommentQueryRepositoryImpl commentQueryRepositoryImpl;
+    private final CommentQueryRepository commentQueryRepository;
 
     private final AiService aiService;
 
@@ -97,11 +97,11 @@ public class CommentService {
 
         long total;
         if (parentId == null) {
-            list = commentQueryRepositoryImpl.getTopComments(postId, page, size);
-            total = commentQueryRepositoryImpl.countTopComments(postId);
+            list = commentQueryRepository.getTopComments(postId, page, size);
+            total = commentQueryRepository.countTopComments(postId);
         } else {
-            list = commentQueryRepositoryImpl.getChildComments(parentId, page, size);
-            total = commentQueryRepositoryImpl.countChildComments(parentId);
+            list = commentQueryRepository.getChildComments(parentId, page, size);
+            total = commentQueryRepository.countChildComments(parentId);
         }
 
         return PageResponse.of(list, page, size, total);
@@ -109,9 +109,9 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public PageResponse<MyPageCommentListResponse> getCommentsByUser(SessionUser user, int page, int size) {
-        List<MyPageCommentListResponse> list = commentQueryRepositoryImpl.getCommentsByUserId(user.getId(), page, size);
+        List<MyPageCommentListResponse> list = commentQueryRepository.getCommentsByUserId(user.getId(), page, size);
 
-        return PageResponse.of(list, page, size, commentQueryRepositoryImpl.countCommentsByUserId(user.getId()));
+        return PageResponse.of(list, page, size, commentQueryRepository.countCommentsByUserId(user.getId()));
     }
     /**
      * 게시글 존재 여부 검증
