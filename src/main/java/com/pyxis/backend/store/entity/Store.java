@@ -1,5 +1,6 @@
 package com.pyxis.backend.store.entity;
 
+import com.pyxis.backend.store.dto.StoreUpdateRequest;
 import com.pyxis.backend.user.entity.Users;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,4 +40,15 @@ public class Store {
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    public void update(StoreUpdateRequest request) {
+        if(request.getStoreName() != null &&  !request.getStoreName().isEmpty())
+            this.name = request.getStoreName();
+        if(request.getAddress() != null &&  !request.getAddress().isEmpty())
+            this.address = request.getAddress();
+        if(request.getIndustryCode() != null && !request.getIndustryCode().isEmpty()){
+            this.industryCode = request.getIndustryCode();
+        }
+    }
+
 }
