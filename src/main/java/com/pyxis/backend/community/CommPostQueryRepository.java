@@ -1,7 +1,7 @@
 package com.pyxis.backend.community;
 
+import com.pyxis.backend.community.dto.CommPostListResponse;
 import com.pyxis.backend.community.dto.MyPagePostListResponse;
-import com.pyxis.backend.community.entity.CommPost;
 import com.pyxis.backend.community.entity.PostType;
 import com.pyxis.backend.user.dto.SessionUser;
 import org.springframework.data.domain.Page;
@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface CommPostQueryRepository {
 
-    Page<CommPost> searchPosts(PostType type, String query, Pageable pageable);
+    Page<CommPostListResponse> searchPosts(PostType type, String query, Pageable pageable);
 
     List<MyPagePostListResponse> getPostsByUser(SessionUser user, int page, int size);
 

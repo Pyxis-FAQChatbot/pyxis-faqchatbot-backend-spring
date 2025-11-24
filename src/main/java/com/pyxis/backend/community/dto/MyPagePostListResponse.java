@@ -11,21 +11,10 @@ public record MyPagePostListResponse(
         String content,
         PostType postType,
         Long viewCount,
-        LocalDateTime createdAt) {
+        LocalDateTime createdAt,
+        Long commentCount) {
 
     @QueryProjection
-    public MyPagePostListResponse(
-            Long postId,
-            String title,
-            String content,
-            PostType postType,
-            Long viewCount,
-            LocalDateTime createdAt) {
-        this.postId = postId;
-        this.title = title;
-        this.content = content;
-        this.postType = postType;
-        this.viewCount = viewCount;
-        this.createdAt = createdAt;
+    public MyPagePostListResponse {
     }
 }

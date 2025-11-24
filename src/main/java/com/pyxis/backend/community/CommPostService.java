@@ -69,8 +69,9 @@ public class CommPostService {
         PostType postType = (type == null || type.isEmpty())
                 ? null
                 : PostType.fromString(type);
-        Page<CommPost> commPosts = commPostQueryRepository.searchPosts(postType, query, pageable);
-        return PageResponse.of(commPosts.map(CommPostListResponse::of));
+        Page<CommPostListResponse> commPostListResponses = commPostQueryRepository.searchPosts(postType, query, pageable);
+
+        return PageResponse.of(commPostListResponses);
     }
 
     @Transactional

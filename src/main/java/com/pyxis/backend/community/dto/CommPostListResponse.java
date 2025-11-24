@@ -1,33 +1,15 @@
 package com.pyxis.backend.community.dto;
 
-import com.pyxis.backend.community.entity.CommPost;
 import com.pyxis.backend.community.entity.PostType;
-import lombok.Builder;
-import lombok.Getter;
+import com.querydsl.core.annotations.QueryProjection;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Builder
-public class CommPostListResponse {
+public record CommPostListResponse(Long postId, String title, String content, PostType postType, Long viewCount,
+                                   LocalDateTime createdAt, Long commentCount) {
 
-    private Long communityId;
-    private String nickname;
-    private PostType postType;
-    private String title;
-    private String content;
-    private Long viewCount;
-    private LocalDateTime createdAt;
-
-    public static CommPostListResponse of(CommPost commPost) {
-        return CommPostListResponse.builder()
-                .communityId(commPost.getId())
-                .nickname(commPost.getUser().getNickname())
-                .postType(commPost.getPostType())
-                .title(commPost.getTitle())
-                .content(commPost.getContent())
-                .viewCount(commPost.getViewCount())
-                .createdAt(commPost.getCreatedAt())
-                .build();
+    @QueryProjection
+    public CommPostListResponse {
     }
 }
+

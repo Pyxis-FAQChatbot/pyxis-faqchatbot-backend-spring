@@ -1,13 +1,16 @@
 package com.pyxis.backend.community;
 
+import com.pyxis.backend.comment.entity.QComment;
+import com.pyxis.backend.community.dto.CommPostListResponse;
 import com.pyxis.backend.community.dto.MyPagePostListResponse;
+import com.pyxis.backend.community.dto.QCommPostListResponse;
 import com.pyxis.backend.community.dto.QMyPagePostListResponse;
-import com.pyxis.backend.community.entity.CommPost;
 import com.pyxis.backend.community.entity.PostType;
 import com.pyxis.backend.community.entity.QCommPost;
 import com.pyxis.backend.user.dto.SessionUser;
 import com.pyxis.backend.user.entity.QUsers;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,13 +22,15 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class CommPostQueryRepositoryImpl implements CommPostQueryRepository{
+public class CommPostQueryRepositoryImpl implements CommPostQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<CommPost> searchPosts(PostType type, String query, Pageable pageable) {
+    public Page<CommPostListResponse> searchPosts(PostType type, String query, Pageable pageable) {
+
         QCommPost c = QCommPost.commPost;
+        QComment cm = QComment.comment;
         QUsers u = QUsers.users;
 
         BooleanBuilder builder = new BooleanBuilder();
@@ -38,9 +43,20 @@ public class CommPostQueryRepositoryImpl implements CommPostQueryRepository{
             builder.and(c.title.containsIgnoreCase(query));
         }
 
-        List<CommPost> content = queryFactory
-                .selectFrom(c)
-                .join(c.user, u).fetchJoin()
+        List<CommPostListResponse> content = queryFactory
+                .select(new QCommPostListResponse(
+                        c.id,
+                        c.title,
+                        c.content,
+                        c.postType,
+                        c.viewCount,
+                        c.createdAt,
+                        JPAExpressions.select(cm.count())
+                                .from(cm)
+                                .where(cm.commPost.id.eq(c.id))
+                ))
+                .from(c)
+                .join(c.user, u)
                 .where(builder)
                 .orderBy(c.createdAt.desc())
                 .offset(pageable.getOffset())
@@ -60,6 +76,7 @@ public class CommPostQueryRepositoryImpl implements CommPostQueryRepository{
     public List<MyPagePostListResponse> getPostsByUser(SessionUser user, int page, int size) {
 
         QCommPost c = QCommPost.commPost;
+        QComment cm = QComment.comment;
         QUsers u = QUsers.users;
 
         return queryFactory
@@ -69,7 +86,10 @@ public class CommPostQueryRepositoryImpl implements CommPostQueryRepository{
                         c.content,
                         c.postType,
                         c.viewCount,
-                        c.createdAt
+                        c.createdAt,
+                        JPAExpressions.select(cm.count())
+                                .from(cm)
+                                .where(cm.commPost.id.eq(c.id))
                 ))
                 .from(c)
                 .join(c.user, u)
@@ -84,7 +104,7 @@ public class CommPostQueryRepositoryImpl implements CommPostQueryRepository{
     public long countCommentsByUserId(Long userId) {
         QCommPost c = QCommPost.commPost;
 
-        Long count =  queryFactory
+        Long count = queryFactory
                 .select(c.count())
                 .from(c)
                 .where(c.user.id.eq(userId))
