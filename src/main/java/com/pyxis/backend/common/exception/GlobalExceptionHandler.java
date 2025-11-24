@@ -39,15 +39,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * 2) @Valid 바인딩 에러 (RequestBody DTO)
      * ========================= */
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request
+    ) {
 
-        List<String> missingFields = ex.getBindingResult().getFieldErrors().stream()
-                .map(FieldError::getField)
-                .distinct()
+        List<Map<String, String>> fieldErrors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(err -> Map.of(
+                        "field", err.getField(),
+                        "message", Objects.requireNonNull(err.getDefaultMessage()) // ★ 패턴 메시지 포함
+                ))
                 .toList();
 
         Map<String, Object> body = baseBody("BAD_REQUEST", "요청 값이 올바르지 않습니다.");
-        putIfNotEmpty(body, Map.of("missing_fields", missingFields));
+        putIfNotEmpty(body, Map.of("errors", fieldErrors));
+
         return ResponseEntity.badRequest().body(body);
     }
 
