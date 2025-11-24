@@ -1,7 +1,6 @@
 package com.pyxis.backend.comment;
 
 import com.pyxis.backend.ai.AiService;
-import com.pyxis.backend.ai.dto.AbuseFilterResponse;
 import com.pyxis.backend.comment.dto.*;
 import com.pyxis.backend.comment.entity.Comment;
 import com.pyxis.backend.comment.entity.CommentStatus;
@@ -14,13 +13,18 @@ import com.pyxis.backend.user.UserRepository;
 import com.pyxis.backend.user.dto.SessionUser;
 import com.pyxis.backend.user.entity.Users;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -52,23 +56,25 @@ public class CommentService {
                 .status(CommentStatus.ACTIVE)
                 .build();
 
-        if(parent != null) {
+        if (parent != null) {
             commentRepository.increaseChildCount(parent.getId());
         }
 
         Comment saved = commentRepository.save(comment);
 
-//        TransactionSynchronizationManager.registerSynchronization(
-//                new TransactionSynchronization() {
-//                    @Override
-//                    public void afterCommit() {
-//                        aiService.filterTextAsync(sessionUser, request.getContent())
-//                    .thenAccept(res -> {
-//                            updateCommentStatus(saved.getId(), res);
-//                        });
-//                    }
-//                }
-//        );
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        aiService.filterTextAsync(sessionUser, request.getContent())
+                                .thenAccept(res -> aiService.updateCommentStatus(saved.getId(), res))
+                                .exceptionally(ex -> {
+                                    log.error("🚨 AI 필터링 중 에러 발생: {}", ex.getMessage(), ex);
+                                    return null;
+                                });
+                    }
+                }
+        );
 
         return CreateCommentResponse.of(saved, sessionUser);
     }
@@ -113,6 +119,7 @@ public class CommentService {
 
         return PageResponse.of(list, page, size, commentQueryRepository.countCommentsByUserId(user.getId()));
     }
+
     /**
      * 게시글 존재 여부 검증
      */
@@ -166,7 +173,13 @@ public class CommentService {
      * 댓글 작성자 본인인지 검증
      */
     private void validateCommentOwner(Comment comment, SessionUser user) {
-        if (!comment.getUser().getId().equals(user.getId())) {
+        Long ownerId = commentQueryRepository.findCommentOwnerId(comment.getId());
+
+        if (ownerId == null) {
+            throw new CustomException(ErrorType.COMMENT_NOT_FOUND);
+        }
+
+        if (!Objects.equals(ownerId, user.getId())) {
             throw new CustomException(ErrorType.USER_FORBIDDEN);
         }
     }
@@ -184,14 +197,5 @@ public class CommentService {
         validateCommentOwner(comment, user);
 
         return comment;
-    }
-
-    public void updateCommentStatus(Long commentId, AbuseFilterResponse res) {
-        if (res.isBlocked()) {
-            int updated = commentRepository.updateStatus(commentId, CommentStatus.BLOCKED);
-            if (updated == 0) {
-                throw new CustomException(ErrorType.COMMENT_NOT_FOUND);
-            }
-        }
     }
 }

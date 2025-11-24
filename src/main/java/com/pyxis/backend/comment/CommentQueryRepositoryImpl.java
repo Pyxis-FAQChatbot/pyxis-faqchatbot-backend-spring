@@ -153,4 +153,15 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
 
         return count != null ? count : 0L;
     }
+
+    @Override
+    public Long findCommentOwnerId(Long commentId) {
+        QComment c = QComment.comment;
+
+        return queryFactory
+                .select(c.user.id)
+                .from(c)
+                .where(c.id.eq(commentId))
+                .fetchOne();
+    }
 }

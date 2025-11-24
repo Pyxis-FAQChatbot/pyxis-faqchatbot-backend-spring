@@ -3,6 +3,8 @@ package com.pyxis.backend.ai;
 import com.pyxis.backend.ai.dto.AbuseFilterRequest;
 import com.pyxis.backend.ai.dto.AbuseFilterResponse;
 import com.pyxis.backend.ai.dto.AiChatRequest;
+import com.pyxis.backend.comment.CommentRepository;
+import com.pyxis.backend.comment.entity.CommentStatus;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
 import com.pyxis.backend.message.dto.BotResponse;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
@@ -24,6 +27,8 @@ import java.util.concurrent.CompletableFuture;
 public class AiService {
 
     private final WebClient webClient;
+
+    private final CommentRepository commentRepository;
 
     public BotResponse chat(AiChatRequest request) {
         try {
@@ -67,6 +72,16 @@ public class AiService {
                 )
                 .bodyToMono(AbuseFilterResponse.class)
                 .toFuture(); // Mono -> CompletableFuture 로 변환
+    }
+
+    @Transactional
+    public void updateCommentStatus(Long commentId, AbuseFilterResponse res) {
+        if (res.isBlocked()) {
+            int updated = commentRepository.updateStatus(commentId, CommentStatus.BLOCKED);
+            if (updated == 0) {
+                throw new CustomException(ErrorType.COMMENT_NOT_FOUND);
+            }
+        }
     }
 
 }

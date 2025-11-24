@@ -18,4 +18,6 @@ public interface CommentQueryRepository {
     List<MyPageCommentListResponse> getCommentsByUserId(Long userId, int page, int size);
 
     long countCommentsByUserId(Long userId);
+
+    Long findCommentOwnerId(Long commentId);
 }
