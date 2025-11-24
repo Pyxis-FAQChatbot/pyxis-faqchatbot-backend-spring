@@ -31,8 +31,6 @@ public record CommentListResponse(Long commentId, Long userId, String nickname, 
         this.status = status;
         this.childCommentCount = childCommentCount;
         this.createdAt = createdAt;
-
-
     }
 }
 

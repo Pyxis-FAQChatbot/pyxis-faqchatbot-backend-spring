@@ -1,7 +1,9 @@
 package com.pyxis.backend.comment;
 
 import com.pyxis.backend.comment.dto.CommentListResponse;
+import com.pyxis.backend.comment.dto.MyPageCommentListResponse;
 import com.pyxis.backend.comment.dto.QCommentListResponse;
+import com.pyxis.backend.comment.dto.QMyPageCommentListResponse;
 import com.pyxis.backend.comment.entity.QComment;
 import com.pyxis.backend.user.entity.QUsers;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -113,4 +115,42 @@ public class CommentQueryRepositoryImpl implements CommentQueryRepository {
         return result != null ? result : 0L;
     }
 
+    @Override
+    public List<MyPageCommentListResponse> getCommentsByUserId(Long userId, int page, int size) {
+
+        QComment c = QComment.comment;
+        QUsers u = QUsers.users;
+
+        return queryFactory
+                .select(new QMyPageCommentListResponse(
+                        c.commPost.id,
+                        c.id,
+                        c.parentComment.id,
+                        u.nickname,
+                        c.content,
+                        c.createdAt,
+                        c.childCount,
+                        c.status
+                ))
+                .from(c)
+                .join(c.user, u)
+                .where(c.user.id.eq(userId))
+                .orderBy(c.createdAt.desc())
+                .offset((long) page * size)
+                .limit(size)
+                .fetch();
+    }
+
+    @Override
+    public long countCommentsByUserId(Long userId) {
+        QComment c = QComment.comment;
+
+        Long count =  queryFactory
+                .select(c.count())
+                .from(c)
+                .where(c.user.id.eq(userId))
+                .fetchOne();
+
+        return count != null ? count : 0L;
+    }
 }

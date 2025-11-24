@@ -2,10 +2,7 @@ package com.pyxis.backend.comment;
 
 import com.pyxis.backend.ai.AiService;
 import com.pyxis.backend.ai.dto.AbuseFilterResponse;
-import com.pyxis.backend.comment.dto.CommentListResponse;
-import com.pyxis.backend.comment.dto.CreateCommentRequest;
-import com.pyxis.backend.comment.dto.CreateCommentResponse;
-import com.pyxis.backend.comment.dto.UpdateCommentRequest;
+import com.pyxis.backend.comment.dto.*;
 import com.pyxis.backend.comment.entity.Comment;
 import com.pyxis.backend.comment.entity.CommentStatus;
 import com.pyxis.backend.common.dto.PageResponse;
@@ -19,8 +16,6 @@ import com.pyxis.backend.user.entity.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
@@ -112,6 +107,12 @@ public class CommentService {
         return PageResponse.of(list, page, size, total);
     }
 
+    @Transactional(readOnly = true)
+    public PageResponse<MyPageCommentListResponse> getCommentsByUser(SessionUser user, int page, int size) {
+        List<MyPageCommentListResponse> list = commentQueryRepositoryImpl.getCommentsByUserId(user.getId(), page, size);
+
+        return PageResponse.of(list, page, size, commentQueryRepositoryImpl.countCommentsByUserId(user.getId()));
+    }
     /**
      * 게시글 존재 여부 검증
      */
