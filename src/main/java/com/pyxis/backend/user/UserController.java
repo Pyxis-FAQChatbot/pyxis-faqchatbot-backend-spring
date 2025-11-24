@@ -7,6 +7,7 @@ import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
 import com.pyxis.backend.community.CommPostService;
 import com.pyxis.backend.user.dto.LoginRequest;
+import com.pyxis.backend.user.dto.PasswordChangeRequest;
 import com.pyxis.backend.user.dto.SessionUser;
 import com.pyxis.backend.user.dto.SignupRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -114,6 +115,21 @@ public class UserController {
         if (user == null) {
             throw new CustomException(ErrorType.UNAUTHORIZED);
         }
-        return ResponseEntity.ok(commPostService.getPostsByUser(user,page,size));
+        return ResponseEntity.ok(commPostService.getPostsByUser(user, page, size));
+    }
+
+    @PatchMapping("/mypage/password")
+    public ResponseEntity<?> changePassword(
+            @RequestBody @Valid PasswordChangeRequest request,
+            HttpSession session) {
+
+        SessionUser user = (SessionUser) session.getAttribute("user");
+        if (user == null) {
+            throw new CustomException(ErrorType.UNAUTHORIZED);
+        }
+
+        userService.changePassword(request, user);
+
+        return ResponseEntity.ok().build();
     }
 }

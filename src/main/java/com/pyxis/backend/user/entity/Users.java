@@ -48,4 +48,8 @@ public class Users {
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    public void updatePassword(String encodePassword) {
+        this.password = encodePassword;
+    }
 }

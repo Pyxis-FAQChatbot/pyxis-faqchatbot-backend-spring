@@ -1,29 +1,23 @@
 package com.pyxis.backend.user.dto;
 
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 @Getter
-public class SignupRequest {
+public class PasswordChangeRequest {
 
-    @NotBlank
-    private String loginId;
     @NotBlank
     @Pattern(
             regexp = "^(?=\\S+$).{4,20}$",
             message = "비밀번호는 공백 없이 4~20자여야 합니다."
     )
-    private String password;
+    private String oldPassword;
     @NotBlank
-    private String checkPassword;
-    @NotBlank
-    private String nickname;
-    @NotBlank
-    private String gender;
-    @NotBlank
-    private String birthday;
-    @NotBlank
-    private String addressMain;
-
+    @Pattern(
+            regexp = "^(?=\\S+$).{4,20}$",
+            message = "비밀번호는 공백 없이 4~20자여야 합니다."
+    )
+    private String newPassword;
 }
