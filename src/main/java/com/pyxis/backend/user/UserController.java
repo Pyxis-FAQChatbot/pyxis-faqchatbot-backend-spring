@@ -6,10 +6,7 @@ import com.pyxis.backend.common.dto.PageResponse;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
 import com.pyxis.backend.community.CommPostService;
-import com.pyxis.backend.user.dto.LoginRequest;
-import com.pyxis.backend.user.dto.PasswordChangeRequest;
-import com.pyxis.backend.user.dto.SessionUser;
-import com.pyxis.backend.user.dto.SignupRequest;
+import com.pyxis.backend.user.dto.*;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -129,6 +126,30 @@ public class UserController {
         }
 
         userService.changePassword(request, user);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/mypage/nickname")
+    public ResponseEntity<?> changeNickname(@RequestBody @Valid ChangeNicknameRequest request,
+                                            HttpSession session) {
+        SessionUser user = (SessionUser) session.getAttribute("user");
+        if (user == null) {
+            throw new CustomException(ErrorType.UNAUTHORIZED);
+        }
+        userService.changeNickname(request.getNewNickname(), user);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/mypage/address")
+    public ResponseEntity<?> changeAddress(@RequestBody @Valid ChangeAddressRequest request,
+                                            HttpSession session) {
+        SessionUser user = (SessionUser) session.getAttribute("user");
+        if (user == null) {
+            throw new CustomException(ErrorType.UNAUTHORIZED);
+        }
+        userService.changeAddress(request.getNewAddress(), user);
 
         return ResponseEntity.ok().build();
     }

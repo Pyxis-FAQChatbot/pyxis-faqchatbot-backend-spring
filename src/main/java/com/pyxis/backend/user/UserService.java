@@ -59,6 +59,23 @@ public class UserService {
     }
 
     @Transactional
+    public void changeNickname(String nickname, SessionUser user) {
+        Users users = userRepository.findById(user.getId()).orElseThrow(
+                () -> new CustomException(ErrorType.USER_NOT_FOUND)
+        );
+        existUsersByNickname(nickname);
+        users.updateNickname(nickname);
+    }
+
+    @Transactional
+    public void changeAddress(String address, SessionUser user) {
+        Users users = userRepository.findById(user.getId()).orElseThrow(
+                () -> new CustomException(ErrorType.USER_NOT_FOUND)
+        );
+        users.updateAddress(address);
+    }
+
+    @Transactional
     public void changePassword(@Valid PasswordChangeRequest request, SessionUser user) {
 
         Users users = userRepository.findById(user.getId()).orElseThrow(
@@ -86,6 +103,4 @@ public class UserService {
             throw new CustomException(ErrorType.LOGINID_ALREADY_EXISTS);
         }
     }
-
-
 }

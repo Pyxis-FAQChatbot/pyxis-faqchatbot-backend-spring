@@ -52,4 +52,12 @@ public class Users {
     public void updatePassword(String encodePassword) {
         this.password = encodePassword;
     }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateAddress(String address) {
+        this.addressMain = address;
+    }
 }
