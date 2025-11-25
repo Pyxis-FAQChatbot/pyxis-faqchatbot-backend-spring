@@ -37,23 +37,31 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-                "https://localhost:3000",
-                "https://192.168.100.202:3000",
-                "http://localhost:3000",
-                "http://192.168.100.202:3000",
-                "http://localhost:5173",
-                "http://192.168.100.202:5173"
-        ));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
-        configuration.setExposedHeaders(List.of("Set-Cookie"));
+        CorsConfiguration config = new CorsConfiguration();
+
+        // ★ 쿠키 사용 시 필수
+        config.setAllowCredentials(true);
+
+        // 로컬 React 개발 환경 (3000, 5173 등)
+        config.addAllowedOriginPattern("http://localhost:*");
+        config.addAllowedOriginPattern("http://127.0.0.1:*");
+        config.addAllowedOriginPattern("http://192.168.*:*");
+
+        // 네이버 클라우드 서버 HTTPS (도메인 또는 IP)
+        config.addAllowedOriginPattern("https://49.50.136.82:*");
+
+        // 허용 메서드 + 헤더
+        config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
+
+        // 프론트에서 쿠키 읽을 수 있도록
+        config.addExposedHeader("Set-Cookie");
+
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 }
