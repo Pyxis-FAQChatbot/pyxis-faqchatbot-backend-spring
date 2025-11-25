@@ -48,6 +48,8 @@ public class CommPostQueryRepositoryImpl implements CommPostQueryRepository {
                         c.id,
                         c.title,
                         c.content,
+                        u.id,
+                        u.nickname,
                         c.postType,
                         c.viewCount,
                         c.createdAt,
