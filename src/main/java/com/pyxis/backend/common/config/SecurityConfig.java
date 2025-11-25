@@ -49,7 +49,7 @@ public class SecurityConfig {
 
         // 네이버 클라우드 서버 HTTPS (도메인 또는 IP)
         config.addAllowedOriginPattern("https://49.50.136.82:*");
-
+        config.addAllowedOriginPattern("http://49.50.136.82:*");
         // 허용 메서드 + 헤더
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
