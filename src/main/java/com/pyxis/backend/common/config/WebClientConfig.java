@@ -18,30 +18,37 @@ public class WebClientConfig {
 
 
 
-    @Value("${external.fastapi-url}")
-    private String fastapiUrl;
+    @Value("${external.fastapi-url-8000}")
+    private String fastapi8000;
+
+    @Value("${external.fastapi-url-9000}")
+    private String fastapi9000;
+
+    private HttpClient createHttpClient() {
+        return HttpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                .responseTimeout(Duration.ofSeconds(30))
+                .doOnConnected(conn -> conn
+                        .addHandlerLast(new ReadTimeoutHandler(60, TimeUnit.SECONDS))
+                        .addHandlerLast(new WriteTimeoutHandler(10, TimeUnit.SECONDS))
+                );
+    }
 
     @Bean
-    public WebClient webClient() {
-        // HttpClient 설정
-        HttpClient httpClient = HttpClient.create()
-                // 연결 타임아웃: 서버 연결 시도 시간 (5초)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-
-                // 응답 타임아웃: 전체 응답 대기 시간 (60초 - AI는 느림)
-                .responseTimeout(Duration.ofSeconds(30))
-
-                // Read/Write 타임아웃
-                .doOnConnected(conn -> conn
-                        .addHandlerLast(new ReadTimeoutHandler(60, TimeUnit.SECONDS))   // 읽기: 60초
-                        .addHandlerLast(new WriteTimeoutHandler(10, TimeUnit.SECONDS))  // 쓰기: 10초
-                );
-
-        // WebClient 빌드
+    public WebClient fastApi8000Client() {
         return WebClient.builder()
-                .baseUrl(fastapiUrl)
+                .baseUrl(fastapi8000)
+                .clientConnector(new ReactorClientHttpConnector(createHttpClient()))
                 .defaultHeader("Content-Type", "application/json")
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+    }
+
+    @Bean
+    public WebClient fastApi9000Client() {
+        return WebClient.builder()
+                .baseUrl(fastapi9000)
+                .clientConnector(new ReactorClientHttpConnector(createHttpClient()))
+                .defaultHeader("Content-Type", "application/json")
                 .build();
     }
 }

@@ -26,7 +26,8 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 public class AiService {
 
-    private final WebClient webClient;
+    private final WebClient fastApi8000Client;
+    private final WebClient fastApi9000Client;
 
     private final CommentRepository commentRepository;
 
@@ -34,7 +35,7 @@ public class AiService {
         try {
             log.info("ClientQuery : {}",request.getQuery());
 
-            BotResponse response = webClient.post()
+            BotResponse response = fastApi8000Client.post()
                     .uri("/api/v1/query")  // ✅ AI API 엔드포인트
                     .bodyValue(request)
                     .retrieve()
@@ -62,7 +63,7 @@ public class AiService {
 
         AbuseFilterRequest request = AbuseFilterRequest.of(sessionUser, query);
 
-        return webClient.post()
+        return fastApi9000Client.post()
                 .uri("/api/v1/filter/text")
                 .bodyValue(request)
                 .retrieve()
