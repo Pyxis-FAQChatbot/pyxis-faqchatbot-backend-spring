@@ -2,6 +2,7 @@ package com.pyxis.backend.message.entity;
 
 import com.pyxis.backend.chat.botchat.entity.Botchat;
 import com.pyxis.backend.common.converter.SourceDataListConverter;
+import com.pyxis.backend.common.converter.StringListConverter;
 import com.pyxis.backend.message.dto.SourceData;
 import com.pyxis.backend.user.entity.Users;
 import jakarta.persistence.*;
@@ -46,6 +47,11 @@ public class BotMessage {
     @Column(name = "source_data", columnDefinition = "JSON")
     @Builder.Default
     private List<SourceData> sourceData = new ArrayList<>();
+
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = "JSON")
+    @Builder.Default
+    private List<String> followUpQuestions = new ArrayList<>();
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

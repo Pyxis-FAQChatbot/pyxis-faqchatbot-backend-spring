@@ -59,6 +59,7 @@ public class BotMessageService {
                 .userQuery(request.getUserQuery())
                 .botResponse(aiResponse.getBotResponse())
                 .sourceData(convertToSourceDataList(aiResponse.getSourceData()))
+                .followUpQuestions(aiResponse.getFollowUpQuestions())
                 .build());
 
         // 썸네일 제목
@@ -88,8 +89,19 @@ public class BotMessageService {
         Page<BotMessage> botMessagePage = botMessageRepository
                 .findByBotchatIdAndUserId(chatbotId, sessionUser.getId(), pageable);
 
+        List<BotMessage> content = botMessagePage.getContent();
+
+        boolean isFirstPage = pageable.getPageNumber() == 0 && !content.isEmpty();
+
         return PageResponse.of(
-                botMessagePage.map(message -> BotMessageResponse.of(message, List.of()))
+                botMessagePage.map(message ->
+                        BotMessageResponse.of(
+                                message,
+                                (isFirstPage && message == content.get(0))
+                                        ? content.get(0).getFollowUpQuestions()
+                                        : List.of()
+                        )
+                )
         );
     }
 
