@@ -137,7 +137,9 @@ public class UserController {
         if (user == null) {
             throw new CustomException(ErrorType.UNAUTHORIZED);
         }
-        userService.changeNickname(request.getNewNickname(), user);
+        SessionUser sessionUser = SessionUser.from(userService.changeNickname(request.getNewNickname(), user));
+
+        session.setAttribute("user", sessionUser);
 
         return ResponseEntity.ok().build();
     }
@@ -149,7 +151,9 @@ public class UserController {
         if (user == null) {
             throw new CustomException(ErrorType.UNAUTHORIZED);
         }
-        userService.changeAddress(request.getNewAddress(), user);
+        SessionUser sessionUser = SessionUser.from(userService.changeAddress(request.getNewAddress(), user));
+
+        session.setAttribute("user", sessionUser);
 
         return ResponseEntity.ok().build();
     }
