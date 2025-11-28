@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -20,17 +21,18 @@ public class CommPostController {
 
     private final CommPostService commPostService;
 
-    @PostMapping("/community")
+    @PostMapping(value = "/community", consumes = "multipart/form-data")
     public ResponseEntity<CreateCommPostResponse> createCommPost(
-            @RequestBody @Valid CommPostRequest request,
+            @RequestPart("data") @Valid CommPostRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file,
             HttpSession session) {
-        SessionUser user = (SessionUser) session.getAttribute("user");
 
+        SessionUser user = (SessionUser) session.getAttribute("user");
         if (user == null) {
             throw new CustomException(ErrorType.UNAUTHORIZED);
         }
 
-        CreateCommPostResponse response = commPostService.createCommPost(request, user);
+        CreateCommPostResponse response = commPostService.createCommPost(request, file, user);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

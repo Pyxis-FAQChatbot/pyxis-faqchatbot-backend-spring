@@ -3,6 +3,7 @@ package com.pyxis.backend.community;
 import com.pyxis.backend.common.dto.PageResponse;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
+import com.pyxis.backend.common.s3.ObjectStorageService;
 import com.pyxis.backend.community.dto.*;
 import com.pyxis.backend.community.entity.CommPost;
 import com.pyxis.backend.community.entity.PostType;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,17 +31,26 @@ public class CommPostService {
 
     private final CommPostQueryRepository commPostQueryRepository;
 
+    private final ObjectStorageService objectStorageService;
+
     @Transactional
-    public CreateCommPostResponse createCommPost(CommPostRequest request, SessionUser user) {
+    public CreateCommPostResponse createCommPost(CommPostRequest request, MultipartFile file, SessionUser user) {
 
         Users users = userRepository.findById(user.getId()).orElseThrow(
                 () -> new CustomException(ErrorType.USER_NOT_FOUND)
         );
 
+        String imageUrl = null;
+
+        if(file != null && file.isEmpty()) {
+            imageUrl = objectStorageService.upload(file);
+        }
+
         CommPost saveCommPost = commPostRepository.save(CommPost.builder()
                 .user(users)
                 .postType(PostType.fromString(request.postType()))
                 .title(request.title())
+                .imageURL(imageUrl)
                 .content(request.content())
                 .build());
 

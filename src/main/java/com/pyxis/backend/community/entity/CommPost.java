@@ -46,6 +46,9 @@ public class CommPost {
     @Builder.Default
     private Long viewCount = 0L;
 
+    @Column(length = 500)
+    private String imageURL;
+
     @OneToMany(mappedBy = "commPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
