@@ -11,6 +11,7 @@ public record CommPostListResponse(Long postId,
                                    Long userId,
                                    String nickname,
                                    PostType postType,
+                                   String imageUrl,
                                    Long viewCount,
                                    LocalDateTime createdAt,
                                    Long commentCount) {

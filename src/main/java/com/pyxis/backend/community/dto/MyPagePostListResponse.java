@@ -10,6 +10,7 @@ public record MyPagePostListResponse(
         String title,
         String content,
         PostType postType,
+        String imageUrl,
         Long viewCount,
         LocalDateTime createdAt,
         Long commentCount) {

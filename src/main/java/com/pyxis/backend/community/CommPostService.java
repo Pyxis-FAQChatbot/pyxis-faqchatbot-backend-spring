@@ -42,7 +42,7 @@ public class CommPostService {
 
         String imageUrl = null;
 
-        if(file != null && file.isEmpty()) {
+        if(file != null && !file.isEmpty()) {
             imageUrl = objectStorageService.upload(file);
         }
 
@@ -95,17 +95,29 @@ public class CommPostService {
             throw new CustomException(ErrorType.USER_FORBIDDEN);
         }
 
+        if (commPost.getImageURL() != null) {
+            objectStorageService.delete(commPost.getImageURL());
+        }
+
         commPostRepository.delete(commPost);
     }
 
     @Transactional
-    public void updateCommPost(Long communityId, CommPostRequest request, Long sessionUserId) {
+    public void updateCommPost(Long communityId, CommPostRequest request, MultipartFile file, Long sessionUserId) {
 
         CommPost commPost = commPostRepository.findById(communityId)
                 .orElseThrow(() -> new CustomException(ErrorType.COMM_POST_NOT_FOUND));
 
         if (!sessionUserId.equals(commPost.getUser().getId())) {
             throw new CustomException(ErrorType.USER_FORBIDDEN);
+        }
+
+        if (file != null && !file.isEmpty()) {
+            if (commPost.getImageURL() != null) {
+                objectStorageService.delete(commPost.getImageURL());
+            }
+            String newUrl = objectStorageService.upload(file);
+            commPost.updateImage(newUrl);
         }
 
         commPost.update(request);

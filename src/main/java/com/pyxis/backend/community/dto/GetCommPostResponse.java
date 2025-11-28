@@ -22,6 +22,7 @@ public class GetCommPostResponse {
         private String title;
         private String content;
         private PostType postType;
+        private String imageUrl;
         private Long viewCount;
         private LocalDateTime createdAt;
     }
@@ -35,6 +36,7 @@ public class GetCommPostResponse {
                                 .title(commPost.getTitle())
                                 .content(commPost.getContent())
                                 .postType(commPost.getPostType())
+                                .imageUrl(commPost.getImageURL())
                                 .viewCount(commPost.getViewCount())
                                 .createdAt(commPost.getCreatedAt())
                                 .build()

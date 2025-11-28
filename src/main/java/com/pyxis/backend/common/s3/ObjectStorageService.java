@@ -2,7 +2,9 @@ package com.pyxis.backend.common.s3;
 
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.pyxis.backend.common.exception.CustomException;
 import com.pyxis.backend.common.exception.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -34,13 +36,29 @@ public class ObjectStorageService {
             metadata.setContentLength(file.getSize());
             metadata.setContentType(file.getContentType());
 
-            ncpS3Client.putObject(bucket, fileName, file.getInputStream(), metadata);
+
+            PutObjectRequest putObjectRequest = new PutObjectRequest(
+                    bucket,
+                    fileName,
+                    file.getInputStream(),
+                    metadata
+            ).withCannedAcl(CannedAccessControlList.PublicRead);
+
+            ncpS3Client.putObject(putObjectRequest);
 
         } catch (IOException e) {
             throw new CustomException(ErrorType.FILE_UPLOAD_FAILED);
         }
 
-        // 업로드된 파일 접근 URL
         return endpoint + "/" + bucket + "/" + fileName;
+    }
+
+    public void delete(String imageUrl) {
+        try {
+            String fileName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
+            ncpS3Client.deleteObject(bucket, fileName);
+        } catch (Exception e) {
+            throw new CustomException(ErrorType.FILE_DELETE_FAILED);
+        }
     }
 }

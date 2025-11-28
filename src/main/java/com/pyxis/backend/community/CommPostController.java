@@ -68,17 +68,19 @@ public class CommPostController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/community/{communityId}")
-    public ResponseEntity<?> updateCommPost(@PathVariable Long communityId, @RequestBody
-    CommPostRequest request, HttpSession session) {
-        SessionUser user = (SessionUser) session.getAttribute("user");
+    @PatchMapping(value = "/community/{communityId}", consumes = "multipart/form-data")
+    public ResponseEntity<?> updateCommPost(
+            @PathVariable Long communityId,
+            @RequestPart("data") CommPostRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            HttpSession session) {
 
+        SessionUser user = (SessionUser) session.getAttribute("user");
         if (user == null) {
             throw new CustomException(ErrorType.UNAUTHORIZED);
         }
 
-        commPostService.updateCommPost(communityId, request, user.getId());
-
+        commPostService.updateCommPost(communityId, request, file, user.getId());
         return ResponseEntity.noContent().build();
     }
 }

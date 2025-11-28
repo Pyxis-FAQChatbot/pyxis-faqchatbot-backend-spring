@@ -70,4 +70,8 @@ public class CommPost {
             this.postType = PostType.fromString(request.postType());
         }
     }
+
+    public void updateImage(String newUrl) {
+        this.imageURL = newUrl;
+    }
 }

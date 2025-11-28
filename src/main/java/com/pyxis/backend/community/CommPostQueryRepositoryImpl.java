@@ -51,6 +51,7 @@ public class CommPostQueryRepositoryImpl implements CommPostQueryRepository {
                         u.id,
                         u.nickname,
                         c.postType,
+                        c.imageURL,
                         c.viewCount,
                         c.createdAt,
                         JPAExpressions.select(cm.count())
@@ -87,6 +88,7 @@ public class CommPostQueryRepositoryImpl implements CommPostQueryRepository {
                         c.title,
                         c.content,
                         c.postType,
+                        c.imageURL,
                         c.viewCount,
                         c.createdAt,
                         JPAExpressions.select(cm.count())
