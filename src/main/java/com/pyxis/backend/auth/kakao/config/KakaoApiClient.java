@@ -1,7 +1,7 @@
-package com.pyxis.backend.auth;
+package com.pyxis.backend.auth.kakao.config;
 
-import com.pyxis.backend.auth.dto.KakaoTokenResponse;
-import com.pyxis.backend.auth.dto.KakaoUserInfo;
+import com.pyxis.backend.auth.kakao.dto.KakaoTokenResponse;
+import com.pyxis.backend.auth.kakao.dto.KakaoUserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

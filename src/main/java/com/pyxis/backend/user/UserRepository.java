@@ -1,5 +1,6 @@
 package com.pyxis.backend.user;
 
+import com.pyxis.backend.user.entity.UserSocialType;
 import com.pyxis.backend.user.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,6 +16,6 @@ public interface UserRepository extends JpaRepository<Users, Long> {
 
     Optional<Users> findByLoginId(String loginId);
 
-    Optional<Users> findByKakaoId(Long kakaoId);
+    Optional<Users> findBySocialIdAndSocialType(String socialId, UserSocialType type);
 
 }

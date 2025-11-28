@@ -26,8 +26,8 @@ public class Users {
     @Column(unique = true, length = 50)
     private String loginId;
 
-    @Column(unique = true)
-    private Long kakaoId;
+    @Column(length = 100)
+    private String socialId;
 
     private String password;
 
@@ -46,6 +46,10 @@ public class Users {
     private LocalDate birthday;
 
     private String addressMain;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private UserSocialType socialType;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

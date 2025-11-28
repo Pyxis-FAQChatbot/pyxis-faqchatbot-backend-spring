@@ -1,4 +1,4 @@
-package com.pyxis.backend.auth;
+package com.pyxis.backend.auth.kakao;
 
 import com.pyxis.backend.user.dto.SessionUser;
 import com.pyxis.backend.user.entity.Users;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Slf4j
 public class KakaoLoginController {
 
-    private final SocialLoginService socialLoginService;
+    private final KakaoLoginService kakaoLoginService;
 
     @Value("${kakao.client-id}")
     private String clientId;
@@ -58,7 +58,7 @@ public class KakaoLoginController {
         log.info("🎉 Kakao callback received! code={}", code);
 
         // 로그인 처리 (기존 회원 or 신규 회원 가입)
-        Users user = socialLoginService.kakaoLogin(code);
+        Users user = kakaoLoginService.kakaoLogin(code);
 
         // 세션 생성
         SessionUser sessionUser = SessionUser.from(user);

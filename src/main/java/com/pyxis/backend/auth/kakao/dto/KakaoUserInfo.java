@@ -1,4 +1,4 @@
-package com.pyxis.backend.auth.dto;
+package com.pyxis.backend.auth.kakao.dto;
 
 import lombok.Getter;
 

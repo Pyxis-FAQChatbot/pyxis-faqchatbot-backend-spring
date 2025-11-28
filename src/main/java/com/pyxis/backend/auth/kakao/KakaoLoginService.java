@@ -1,9 +1,11 @@
-package com.pyxis.backend.auth;
+package com.pyxis.backend.auth.kakao;
 
-import com.pyxis.backend.auth.dto.KakaoTokenResponse;
-import com.pyxis.backend.auth.dto.KakaoUserInfo;
+import com.pyxis.backend.auth.kakao.config.KakaoApiClient;
+import com.pyxis.backend.auth.kakao.dto.KakaoTokenResponse;
+import com.pyxis.backend.auth.kakao.dto.KakaoUserInfo;
 import com.pyxis.backend.user.UserRepository;
 import com.pyxis.backend.user.entity.UserRole;
+import com.pyxis.backend.user.entity.UserSocialType;
 import com.pyxis.backend.user.entity.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +15,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class SocialLoginService {
+public class KakaoLoginService {
 
     private final KakaoApiClient kakaoApiClient;
     private final UserRepository userRepository;
@@ -24,10 +26,10 @@ public class SocialLoginService {
         KakaoTokenResponse token = kakaoApiClient.requestToken(code);
         KakaoUserInfo info = kakaoApiClient.requestUserInfo(token.getAccess_token());
 
-        Long kakaoId = info.getId();
+        String kakaoId = info.getId().toString();
 
         // 기존 회원이면 그대로 반환
-        return userRepository.findByKakaoId(kakaoId)
+        return userRepository.findBySocialIdAndSocialType(kakaoId, UserSocialType.KAKAO)
                 .orElseGet(() -> createNewKakaoUser(info));
     }
 
@@ -43,9 +45,10 @@ public class SocialLoginService {
 
         Users user = Users.builder()
                 .loginId("kakao_"+info.getId())
-                .kakaoId(info.getId())
+                .socialId(info.getId().toString())
                 .nickname(nickname)
                 .role(UserRole.USER)
+                .socialType(UserSocialType.KAKAO)
                 .build();
 
         return userRepository.save(user);
