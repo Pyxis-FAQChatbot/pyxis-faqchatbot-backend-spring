@@ -23,24 +23,26 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(unique = true, length = 50)
     private String loginId;
 
-    @Column(nullable = false, length = 255)
+    @Column(unique = true)
+    private Long kakaoId;
+
     private String password;
 
-    @Column(nullable = false, unique = true, length = 30)
+    @Column(unique = true, length = 30)
     private String nickname;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private GenderType gender;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private UserRole role;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = true, length = 20)
     private LocalDate birthday;
 
     private String addressMain;

@@ -16,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class WebClientConfig {
 
-
-
     @Value("${external.fastapi-url-8000}")
     private String fastapi8000;
 
@@ -49,6 +47,17 @@ public class WebClientConfig {
                 .baseUrl(fastapi9000)
                 .clientConnector(new ReactorClientHttpConnector(createHttpClient()))
                 .defaultHeader("Content-Type", "application/json")
+                .build();
+    }
+
+    @Bean
+    public WebClient kakaoWebClient() {
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(
+                        HttpClient.create()
+                                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                                .responseTimeout(Duration.ofSeconds(30))
+                ))
                 .build();
     }
 }
