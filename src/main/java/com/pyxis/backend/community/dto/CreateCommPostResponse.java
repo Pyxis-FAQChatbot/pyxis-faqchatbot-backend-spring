@@ -11,12 +11,14 @@ import java.time.LocalDateTime;
 public class CreateCommPostResponse {
 
     private Long commPostyId;
+    private String imageUrl;
     private LocalDateTime createdAt;
 
 
     public static CreateCommPostResponse from(CommPost commPost) {
         return CreateCommPostResponse.builder()
                 .commPostyId(commPost.getId())
+                .imageUrl(commPost.getImageURL())
                 .createdAt(commPost.getCreatedAt())
                 .build();
     }
