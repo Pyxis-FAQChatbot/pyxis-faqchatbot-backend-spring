@@ -87,7 +87,7 @@ public class NaverLoginController {
         // 로그인 후 프론트로 이동
         return ResponseEntity.status(302)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .header(HttpHeaders.LOCATION, "http://localhost:5173/main")
+                .header(HttpHeaders.LOCATION, "http://49.50.136.82:3000/main")
                 .build();
     }
 }
