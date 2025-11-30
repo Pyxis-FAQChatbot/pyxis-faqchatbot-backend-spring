@@ -62,31 +62,20 @@ public class CommentService {
 
         Comment saved = commentRepository.save(comment);
 
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-                    @Override
-                    public void afterCommit() {
-                        aiService.filterTextAsync(sessionUser, request.getContent())
-                                .thenAccept(res -> aiService.updateCommentStatus(saved.getId(), res))
-                                .exceptionally(ex -> {
-                                    log.error("🚨 AI 필터링 중 에러 발생: {}", ex.getMessage(), ex);
-                                    return null;
-                                });
-                    }
-                }
-        );
+        registerAiFilterAfterCommit(sessionUser, request.getContent(), saved.getId());
 
         return CreateCommentResponse.of(saved, sessionUser);
     }
 
     @Transactional
-    public void updateComment(Long communityId, Long commentId, UpdateCommentRequest request, SessionUser user) {
+    public void updateComment(Long communityId, Long commentId, UpdateCommentRequest request, SessionUser sessionUser) {
 
-        Comment comment = validateCommentAccess(communityId, commentId, user);
+        Comment comment = validateCommentAccess(communityId, commentId, sessionUser);
 
         comment.updateContent(request.getContent());
-    }
 
+        registerAiFilterAfterCommit(sessionUser, request.getContent(), comment.getId());
+    }
 
     @Transactional
     public void deleteComment(Long communityId, Long commentId, SessionUser user) {
@@ -197,5 +186,29 @@ public class CommentService {
         validateCommentOwner(comment, user);
 
         return comment;
+    }
+
+    /**
+     * 트랜잭션 커밋 이후(AfteCommit)에 AI 욕설/비방 필터링을 비동기로 실행하고,
+     * 필터링 결과에 따라 댓글 상태(CommentStatus)를 업데이트하는 후처리 작업을 등록합니다.
+     *
+     * @param sessionUser  요청을 보낸 사용자 정보 (AI 필터링 시 사용자 컨텍스트 전달)
+     * @param content      필터링할 댓글 내용
+     * @param commentId    상태 업데이트 대상 댓글 ID
+     */
+    private void registerAiFilterAfterCommit(SessionUser sessionUser, String content, Long commentId) {
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    aiService.filterTextAsync(sessionUser, content)
+                        .thenAccept(res -> aiService.updateCommentStatus(commentId, res))
+                        .exceptionally(ex -> {
+                            log.error("🚨 AI 필터링 중 에러 발생: {}", ex.getMessage(), ex);
+                            return null;
+                        });
+                }
+            }
+        );
     }
 }
