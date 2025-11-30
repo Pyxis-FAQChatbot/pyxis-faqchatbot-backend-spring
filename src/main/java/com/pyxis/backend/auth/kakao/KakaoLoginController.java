@@ -81,7 +81,7 @@ public class KakaoLoginController {
         // 로그인 후 프론트 메인 페이지로 이동
         return ResponseEntity.status(302)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .header(HttpHeaders.LOCATION, "http://http://49.50.136.82:3000/main/main") // React 메인으로 보내기
+                .header(HttpHeaders.LOCATION, "http://http://49.50.136.82:3000/main") // React 메인으로 보내기
                 .build();
     }
 }
