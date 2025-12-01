@@ -1,10 +1,7 @@
 package com.pyxis.backend.community;
 
 import com.pyxis.backend.comment.entity.QComment;
-import com.pyxis.backend.community.dto.CommPostListResponse;
-import com.pyxis.backend.community.dto.MyPagePostListResponse;
-import com.pyxis.backend.community.dto.QCommPostListResponse;
-import com.pyxis.backend.community.dto.QMyPagePostListResponse;
+import com.pyxis.backend.community.dto.*;
 import com.pyxis.backend.community.entity.PostType;
 import com.pyxis.backend.community.entity.QCommPost;
 import com.pyxis.backend.user.dto.SessionUser;
@@ -26,12 +23,12 @@ public class CommPostQueryRepositoryImpl implements CommPostQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    private static final QCommPost c = QCommPost.commPost;
+    private static final QComment cm = QComment.comment;
+    private static final QUsers u = QUsers.users;
+
     @Override
     public Page<CommPostListResponse> searchPosts(PostType type, String query, Pageable pageable) {
-
-        QCommPost c = QCommPost.commPost;
-        QComment cm = QComment.comment;
-        QUsers u = QUsers.users;
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -78,10 +75,6 @@ public class CommPostQueryRepositoryImpl implements CommPostQueryRepository {
     @Override
     public List<MyPagePostListResponse> getPostsByUser(SessionUser user, int page, int size) {
 
-        QCommPost c = QCommPost.commPost;
-        QComment cm = QComment.comment;
-        QUsers u = QUsers.users;
-
         return queryFactory
                 .select(new QMyPagePostListResponse(
                         c.id,
@@ -115,5 +108,29 @@ public class CommPostQueryRepositoryImpl implements CommPostQueryRepository {
                 .fetchOne();
 
         return count != null ? count : 0L;
+    }
+
+    @Override
+    public GetCommPostResponse getPostDetail(Long communityId) {
+
+        return queryFactory
+                .select(new QGetCommPostResponse(
+                        u.id,
+                        u.nickname,
+                        c.title,
+                        c.content,
+                        c.postType,
+                        c.imageURL,
+                        c.viewCount,
+                        c.createdAt,
+                        JPAExpressions
+                                .select(cm.count())
+                                .from(cm)
+                                .where(cm.commPost.id.eq(c.id))
+                ))
+                .from(c)
+                .join(c.user, u)
+                .where(c.id.eq(communityId))
+                .fetchOne();
     }
 }

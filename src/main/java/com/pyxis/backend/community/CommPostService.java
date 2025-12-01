@@ -60,15 +60,8 @@ public class CommPostService {
 
     @Transactional
     public GetCommPostResponse getCommPost(Long communityId) {
-
         commPostRepository.incrementViewCount(communityId);
-
-        CommPost commPost = commPostRepository.findById(communityId).orElseThrow(
-                () -> new CustomException(ErrorType.COMM_POST_NOT_FOUND)
-        );
-        Users user = commPost.getUser();
-
-        return GetCommPostResponse.from(user, commPost);
+        return commPostQueryRepository.getPostDetail(communityId);
     }
 
     @Transactional(readOnly = true)

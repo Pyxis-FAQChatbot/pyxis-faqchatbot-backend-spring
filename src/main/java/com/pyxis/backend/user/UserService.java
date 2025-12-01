@@ -8,6 +8,7 @@ import com.pyxis.backend.user.dto.SessionUser;
 import com.pyxis.backend.user.dto.SignupRequest;
 import com.pyxis.backend.user.entity.GenderType;
 import com.pyxis.backend.user.entity.UserRole;
+import com.pyxis.backend.user.entity.UserSocialType;
 import com.pyxis.backend.user.entity.Users;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ public class UserService {
                 .role(UserRole.USER)
                 .birthday(LocalDate.parse(request.getBirthday()))
                 .addressMain(request.getAddressMain())
-
+                .socialType(UserSocialType.NONE)
                 .build());
     }
 

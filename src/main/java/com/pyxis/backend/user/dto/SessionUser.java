@@ -2,6 +2,7 @@ package com.pyxis.backend.user.dto;
 
 import com.pyxis.backend.user.entity.GenderType;
 import com.pyxis.backend.user.entity.UserRole;
+import com.pyxis.backend.user.entity.UserSocialType;
 import com.pyxis.backend.user.entity.Users;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class SessionUser implements Serializable {
     private GenderType gender;
     private LocalDate birthday;
     private String addressMain;
+    private UserSocialType userSocial;
     private LocalDateTime createdAt;
 
     public static SessionUser from(Users user) {
@@ -36,6 +38,7 @@ public class SessionUser implements Serializable {
                 .gender(user.getGender())
                 .birthday(user.getBirthday())
                 .addressMain(user.getAddressMain())
+                .userSocial(user.getSocialType())
                 .createdAt(user.getCreatedAt())
                 .build();
     }

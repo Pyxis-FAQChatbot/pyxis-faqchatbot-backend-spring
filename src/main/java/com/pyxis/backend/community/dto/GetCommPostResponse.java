@@ -1,46 +1,33 @@
 package com.pyxis.backend.community.dto;
 
-import com.pyxis.backend.community.entity.CommPost;
 import com.pyxis.backend.community.entity.PostType;
-import com.pyxis.backend.user.entity.Users;
-import lombok.Builder;
-import lombok.Getter;
+import com.querydsl.core.annotations.QueryProjection;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Builder
-public class GetCommPostResponse {
+public record GetCommPostResponse(
+        Long userId,
+        String nickname,
+        CommPostResponse community,
+        long commentCount
+) {
 
-    private Long userId;
-    private String nickname;
-    private CommPostResponse community;
-
-    @Builder
-    @Getter
-    public static class CommPostResponse {
-        private String title;
-        private String content;
-        private PostType postType;
-        private String imageUrl;
-        private Long viewCount;
-        private LocalDateTime createdAt;
+    public record CommPostResponse(String title, String content, PostType postType, String imageUrl, Long viewCount,
+                                   LocalDateTime createdAt) {
     }
 
-    public static GetCommPostResponse from(Users user, CommPost commPost) {
-        return GetCommPostResponse.builder()
-                .userId(user.getId())
-                .nickname(user.getNickname())
-                .community(
-                        CommPostResponse.builder()
-                                .title(commPost.getTitle())
-                                .content(commPost.getContent())
-                                .postType(commPost.getPostType())
-                                .imageUrl(commPost.getImageURL())
-                                .viewCount(commPost.getViewCount())
-                                .createdAt(commPost.getCreatedAt())
-                                .build()
-                )
-                .build();
+    @QueryProjection
+    public GetCommPostResponse(Long userId, String nickname,
+                               String title, String content, PostType postType,
+                               String imageUrl, Long viewCount,
+                               LocalDateTime createdAt, long commentCount) {
+
+        this(
+                userId,
+                nickname,
+                new CommPostResponse(title, content, postType, imageUrl, viewCount, createdAt),
+                commentCount
+        );
     }
 }
+
