@@ -79,14 +79,14 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(HttpSession session) {
+    public ResponseEntity<SessionUser> getCurrentUser(HttpSession session) {
         SessionUser user = (SessionUser) session.getAttribute("user");
 
         if (user == null) {
             throw new CustomException(ErrorType.UNAUTHORIZED);
         }
 
-        return ResponseEntity.ok("test");
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/mypage/comments")
