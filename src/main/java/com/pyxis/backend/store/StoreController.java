@@ -31,6 +31,7 @@ public class StoreController {
 
         storeService.createStore(user, request);
 
+
         return ResponseEntity.ok().build();
     }
 
