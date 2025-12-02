@@ -11,8 +11,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -41,6 +39,10 @@ public class SecurityConfig {
 
         // ★ 쿠키 사용 시 필수
         config.setAllowCredentials(true);
+
+        config.addAllowedOriginPattern("https://pyxis.kr");
+        config.addAllowedOriginPattern("https://www.pyxis.kr");
+        config.addAllowedOriginPattern("https://api.pyxis.kr");
 
         // 로컬 React 개발 환경 (3000, 5173 등)
         config.addAllowedOriginPattern("http://localhost:*");

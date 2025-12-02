@@ -15,12 +15,19 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins(
-                                "https://localhost:3000",
-                                "https://192.168.100.202:3000",
+                                "https://pyxis.kr",
+                                "https://www.pyxis.kr",
+                                "https://api.pyxis.kr",
+
+                                // 로컬 개발용
                                 "http://localhost:3000",
-                                "http://192.168.100.202:3000",
                                 "http://localhost:5173",
-                                "http://192.168.100.202:5173"
+                                "https://localhost:3000",
+                                "https://localhost:5173",
+                                "http://192.168.100.202:3000",
+                                "http://192.168.100.202:5173",
+                                "https://192.168.100.202:3000",
+                                "https://192.168.100.202:5173"
                         )
                         .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
