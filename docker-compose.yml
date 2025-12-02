@@ -1,29 +1,40 @@
-version: "3.9"
+version: "3.8"
 
 services:
-  db:
-    image: mysql:8.0
-    container_name: pyxis-db
-    environment:
-      MYSQL_ROOT_PASSWORD: 12
-      MYSQL_DATABASE: pyxis
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pyxis-api
+
     ports:
-      - "3307:3306"
+      - "8080:8080"
+
+    env_file:
+      - .env
+
+    environment:
+      JAVA_OPTS: >
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -XX:+UseG1GC
+        -Xms256m
+        -Xmx2048m
+
     volumes:
-      - mysql_data:/var/lib/mysql
+      - ./logs:/app/logs
 
-  backend:
-    build: .
-    container_name: pyxis-backend
-    ports:
-      - "8081:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/pyxis?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 12
-      SPRING_JPA_HIBERNATE_DDL_AUTO: create
-    depends_on:
-      - db
+    restart: always
 
-volumes:
-  mysql_data:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+    networks:
+      - api-network
+
+networks:
+  api-network:
+    driver: bridge

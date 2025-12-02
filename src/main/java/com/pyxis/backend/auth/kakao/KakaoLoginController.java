@@ -27,6 +27,8 @@ public class KakaoLoginController {
     @Value("${kakao.redirect-uri}")
     private String redirectUri;
 
+    @Value("${kakao.frontend.redirect-uri}")   // ← 새 환경변수
+    private String frontRedirectUri;
     /**
      * 1) 프론트에서 /login/kakao 호출 → 백엔드에서 카카오 로그인 페이지로 redirect
      */
@@ -67,7 +69,7 @@ public class KakaoLoginController {
         ResponseCookie cookie = ResponseCookie.from("JSESSIONID", session.getId())
                 .path("/")
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .sameSite("None")
                 .maxAge(60 * 60 * 24)  // 24시간
                 .build();
@@ -81,7 +83,7 @@ public class KakaoLoginController {
         // 로그인 후 프론트 메인 페이지로 이동
         return ResponseEntity.status(302)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .header(HttpHeaders.LOCATION, "http://49.50.136.82:3000/main") // React 메인으로 보내기
+                .header(HttpHeaders.LOCATION, frontRedirectUri) // React 메인으로 보내기
                 .build();
     }
 }

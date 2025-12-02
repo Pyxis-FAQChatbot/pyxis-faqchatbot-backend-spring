@@ -27,6 +27,9 @@ public class NaverLoginController {
     @Value("${naver.redirect-uri}")
     private String redirectUri;
 
+    @Value("${naver.frontend.redirect-uri}")
+    private String frontRedirectUri;
+
     /**
      * 1) 프론트에서 /login/naver 호출 → 네이버 로그인 페이지로 redirect
      */
@@ -74,7 +77,7 @@ public class NaverLoginController {
         ResponseCookie cookie = ResponseCookie.from("JSESSIONID", session.getId())
                 .path("/")
                 .httpOnly(true)
-                .secure(false) // 로컬에서는 false
+                .secure(true) // 로컬에서는 false
                 .sameSite("None")
                 .maxAge(60 * 60 * 24)
                 .build();
@@ -87,7 +90,7 @@ public class NaverLoginController {
         // 로그인 후 프론트로 이동
         return ResponseEntity.status(302)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .header(HttpHeaders.LOCATION, "http://49.50.136.82:3000/main")
+                .header(HttpHeaders.LOCATION, frontRedirectUri)
                 .build();
     }
 }

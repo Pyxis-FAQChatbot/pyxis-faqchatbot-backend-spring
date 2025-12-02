@@ -39,3 +39,7 @@ out/
 /src/main/generated/
 # Secret config (local only)
 application-secret.yml
+
+# Environment variables (DO NOT COMMIT)
+.env
+.env.*
