@@ -1,0 +1,48 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Prepare SSH key
+        run: |
+          echo "${{ secrets.SERVER_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+
+      - name: Ensure server directory exists
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
+            mkdir -p ${{ secrets.SERVER_APP_DIR }}
+          "
+
+      - name: Upload project files to server
+        run: |
+          rsync -avz -e "ssh -i key.pem -o StrictHostKeyChecking=no" \
+            --exclude='.git' \
+            --exclude='.github' \
+            ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:${{ secrets.SERVER_APP_DIR }}
+
+      - name: Upload .env file
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
+            echo '${{ secrets.ENV_FILE }}' > ${{ secrets.SERVER_APP_DIR }}/.env
+          "
+
+      - name: Build & Restart with Docker Compose
+        run: |
+          ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
+            cd ${{ secrets.SERVER_APP_DIR }} &&
+            docker-compose down &&
+            sleep 5 &&
+            docker system prune -af &&
+            docker-compose build --no-cache &&
+            docker-compose up -d
+          "
