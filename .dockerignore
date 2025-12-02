@@ -1,6 +1,5 @@
 # 빌드/캐시 제거
 .gradle
-build
 out
 
 # IDE
@@ -14,8 +13,9 @@ out
 # Node 등
 node_modules
 
-# 민감정보 파일 (절대 Docker 이미지에 포함 금지)
-src/main/resources/application-secret.yml
-src/main/resources/application.properties
-src/main/resources/application.yml
+# 로그
+logs
+*.log
+
+# 민감정보(이미 .env에 있음)
 .env
