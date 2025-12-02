@@ -16,10 +16,10 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class WebClientConfig {
 
-    @Value("${external.fastapi-url-8000}")
+    @Value("${external.fastapi.url8000}")
     private String fastapi8000;
 
-    @Value("${external.fastapi-url-9000}")
+    @Value("${external.fastapi.url9000}")
     private String fastapi9000;
 
     private HttpClient createHttpClient() {
