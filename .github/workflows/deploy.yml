@@ -40,9 +40,9 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             cd ${{ secrets.SERVER_APP_DIR }} &&
-            docker-compose down &&
+            docker compose down &&
             sleep 5 &&
             docker system prune -af &&
-            docker-compose build --no-cache &&
-            docker-compose up -d
+            docker compose build --no-cache &&
+            docker compose up -d
           "
