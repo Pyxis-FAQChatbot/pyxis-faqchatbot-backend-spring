@@ -43,6 +43,7 @@ public class AiService {
                     .block();
 
             log.info("AI API 응답 성공");
+
             return response;
 
         } catch (WebClientResponseException e) {
