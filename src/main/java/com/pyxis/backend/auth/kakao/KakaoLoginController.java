@@ -56,7 +56,6 @@ public class KakaoLoginController {
             log.error("❌ 카카오 로그인 실패: code 없음");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
         log.info("🎉 Kakao callback received! code={}", code);
 
         // 로그인 처리 (기존 회원 or 신규 회원 가입)
