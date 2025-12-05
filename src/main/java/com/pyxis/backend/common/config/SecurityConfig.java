@@ -40,18 +40,18 @@ public class SecurityConfig {
         // ★ 쿠키 사용 시 필수
         config.setAllowCredentials(true);
 
-        config.addAllowedOriginPattern("https://pyxis.kr");
-        config.addAllowedOriginPattern("https://www.pyxis.kr");
-        config.addAllowedOriginPattern("https://api.pyxis.kr");
+        config.addAllowedOrigin("https://pyxis.kr");
+        config.addAllowedOrigin("https://www.pyxis.kr");
+        config.addAllowedOrigin("https://api.pyxis.kr");
 
         // 로컬 React 개발 환경 (3000, 5173 등)
-        config.addAllowedOriginPattern("http://localhost:*");
-        config.addAllowedOriginPattern("http://127.0.0.1:*");
-        config.addAllowedOriginPattern("http://192.168.*:*");
+        config.addAllowedOrigin("http://localhost:*");
+        config.addAllowedOrigin("http://127.0.0.1:*");
+        config.addAllowedOrigin("http://192.168.*:*");
 
         // 네이버 클라우드 서버 HTTPS (도메인 또는 IP)
-        config.addAllowedOriginPattern("https://49.50.136.82:*");
-        config.addAllowedOriginPattern("http://49.50.136.82:*");
+        config.addAllowedOrigin("https://49.50.136.82:*");
+        config.addAllowedOrigin("http://49.50.136.82:*");
         // 허용 메서드 + 헤더
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
