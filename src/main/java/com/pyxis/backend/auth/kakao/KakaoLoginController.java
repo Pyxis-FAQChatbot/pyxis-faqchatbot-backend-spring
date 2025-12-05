@@ -66,7 +66,7 @@ public class KakaoLoginController {
         session.setAttribute("user", sessionUser);
 
         ResponseCookie cookie = ResponseCookie.from("JSESSIONID", session.getId())
-                .domain("https://www.pyxis.kr")
+                .domain("www.pyxis.kr")
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
