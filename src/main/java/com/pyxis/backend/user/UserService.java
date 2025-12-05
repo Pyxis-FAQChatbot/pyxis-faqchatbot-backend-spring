@@ -55,6 +55,7 @@ public class UserService {
         if (!passwordEncoder.matches(request.getPassword(), users.getPassword())) {
             throw new CustomException(ErrorType.PASSWORD_NOT_MATCH);
         }
+
         return users;
     }
 
